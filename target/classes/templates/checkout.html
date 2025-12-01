@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bevestiging</title>
+</head>
+<body>
+
+<h1>Bevestiging van je reservatie</h1>
+
+<p>Hier is een overzicht van je gekozen materiaal:</p>
+
+<ul>
+    <li th:each="item : ${items}">
+        <span th:text="${item.product.name}"></span> -
+        <strong th:text="${item.quantity}"></strong> stuks
+    </li>
+</ul>
+
+<p>Dit is een simpele checkout. Later kunnen we echte reservatiedata, datums en user accounts toevoegen.</p>
+
+<a href="/catalog">Terug naar catalogus</a>
+
+</body>
+</html>

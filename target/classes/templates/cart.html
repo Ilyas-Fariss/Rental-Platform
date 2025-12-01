@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Winkelmandje</title>
+</head>
+<body>
+
+<h1>Winkelmandje</h1>
+
+<div th:if="${#lists.isEmpty(items)}">
+    <p>Je winkelmandje is leeg.</p>
+</div>
+
+<table th:if="${!#lists.isEmpty(items)}" border="1" cellpadding="8">
+    <tr>
+        <th>Product</th>
+        <th>Aantal</th>
+        <th>Prijs per dag</th>
+        <th>Actie</th>
+    </tr>
+
+    <tr th:each="item : ${items}">
+        <td th:text="${item.product.name}">Naam</td>
+        <td th:text="${item.quantity}">Aantal</td>
+        <td th:text="${item.product.dailyPrice}">Prijs</td>
+        <td>
+            <a th:href="@{'/cart/remove/' + ${item.product.id}}">Verwijderen</a>
+        </td>
+    </tr>
+</table>
+
+<br>
+<a href="/catalog">Verder winkelen</a> |
+<a href="/cart/checkout">Naar checkout</a>
+
+</body>
+</html>
