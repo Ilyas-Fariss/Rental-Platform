@@ -1,45 +1,157 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Inloggen</title>
+    <title>Inloggen - Rental Platform</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #111;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        nav {
+            background-color: #1e1e1e;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            margin-right: 18px;
+            color: #ddd;
+            font-weight: 500;
+        }
+
+        nav a:hover { color: white; }
+
+        nav form button {
+            background: transparent;
+            border: none;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #1e88e5;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: #1565c0; }
+
+        .link {
+            margin-top: 15px;
+            text-align: center;
+            display: block;
+            color: #1e88e5;
+        }
+
+        .error-msg {
+            color: #b00020;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+
 </head>
+
 <body>
 
-<h1>Inloggen</h1>
-
-<div th:if="${param.error}">
-    <p style="color:red;">Ongeldige gebruikersnaam of wachtwoord.</p>
-</div>
-
-<div th:if="${param.logout}">
-    <p>Je bent uitgelogd.</p>
-</div>
-
-<form th:action="@{/login}" method="post">
-
+<nav>
     <div>
-        <label for="username">Gebruikersnaam:</label>
-        <input type="text" id="username" name="username" required />
+        <a href="/catalog">Catalogus</a>
+        <a href="/cart">Winkelmandje</a>
+        <a href="/orders">Mijn reservaties</a>
     </div>
 
     <div>
-        <label for="password">Wachtwoord:</label>
-        <input type="password" id="password" name="password" required />
+        <a href="/login">Inloggen</a>
+        <a href="/register">Registreren</a>
     </div>
+</nav>
 
-    <button type="submit">Inloggen</button>
 
-</form>
+<div class="container">
+    <div class="card">
 
-<p>
-    Nog geen account?
-    <a href="/register">Registreer hier</a>.
-</p>
+        <h1>Inloggen</h1>
 
-<p>
-    <a href="/catalog">Terug naar catalogus</a>
-</p>
+        <!-- Error bij fout wachtwoord -->
+        <div th:if="${param.error}" class="error-msg">
+            Foutieve gebruikersnaam of wachtwoord.
+        </div>
+
+        <!-- Uitgelogd-message -->
+        <div th:if="${param.logout}" class="error-msg" style="color: green;">
+            Je bent succesvol uitgelogd.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+
+            <label for="username">Gebruikersnaam</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Wachtwoord</label>
+            <input type="password" id="password" name="password" required>
+
+            <button class="btn" type="submit">Inloggen</button>
+        </form>
+
+        <a class="link" href="/register">Nog geen account? Registreer hier</a>
+
+    </div>
+</div>
 
 </body>
 </html>

@@ -11,22 +11,24 @@ import java.util.List;
 @Service
 public class CartService {
 
-    private static final String CART_SESSION_KEY = "cartItems";
+    private static final String SESSION_KEY = "CART_ITEMS";
 
-    @SuppressWarnings("unchecked")
     private List<CartItem> getCart(HttpSession session) {
-        List<CartItem> cart = (List<CartItem>) session.getAttribute(CART_SESSION_KEY);
+        List<CartItem> cart = (List<CartItem>) session.getAttribute(SESSION_KEY);
         if (cart == null) {
             cart = new ArrayList<>();
-            session.setAttribute(CART_SESSION_KEY, cart);
+            session.setAttribute(SESSION_KEY, cart);
         }
         return cart;
+    }
+
+    public List<CartItem> getAllItems(HttpSession session) {
+        return getCart(session);
     }
 
     public void addToCart(Product product, HttpSession session) {
         List<CartItem> cart = getCart(session);
 
-        // check of product al bestaat in het mandje
         for (CartItem item : cart) {
             if (item.getProduct().getId().equals(product.getId())) {
                 item.setQuantity(item.getQuantity() + 1);
@@ -34,20 +36,22 @@ public class CartService {
             }
         }
 
-        CartItem newItem = new CartItem(product, 1);
-        cart.add(newItem);
+        cart.add(new CartItem(product, 1));
     }
 
-    public List<CartItem> getAllItems(HttpSession session) {
-        return getCart(session);
-    }
-
-    public void removeItem(Long productId, HttpSession session) {
+    public void removeFromCart(Long productId, HttpSession session) {
         List<CartItem> cart = getCart(session);
         cart.removeIf(item -> item.getProduct().getId().equals(productId));
     }
 
     public void clearCart(HttpSession session) {
-        session.setAttribute(CART_SESSION_KEY, new ArrayList<>());
+        session.setAttribute(SESSION_KEY, new ArrayList<>());
+    }
+
+    public double calculateTotal(HttpSession session) {
+        return getCart(session)
+                .stream()
+                .mapToDouble(item -> item.getProduct().getDailyPrice() * item.getQuantity())
+                .sum();
     }
 }

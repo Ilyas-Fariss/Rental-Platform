@@ -1,38 +1,240 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>Winkelmandje</title>
+    <title>Winkelmandje - Rental Platform</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #222;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* NAVBAR */
+        nav {
+            background-color: #1e1e1e;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .left a,
+        nav .right a {
+            margin-right: 18px;
+            color: #ddd;
+            font-weight: 500;
+        }
+
+        nav .right form button {
+            background: transparent;
+            border: none;
+            color: #ddd;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        nav .left a:hover,
+        nav .right a:hover,
+        nav .right form button:hover {
+            color: white;
+        }
+
+        /* CONTAINER */
+        .container {
+            width: 95%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .empty {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 6px;
+            background-color: #1e88e5;
+            color: white;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #1565c0;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #c5c5c5;
+        }
+
+        /* TABEL */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        table th, table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        table th {
+            background-color: #f5f5f5;
+            text-align: left;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .total-box {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .total-amount {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .actions a {
+            text-align: center;
+            flex: 1;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Winkelmandje</h1>
+<nav>
+    <div class="left">
+        <a href="/catalog">Catalogus</a>
+        <a href="/cart">Winkelmandje</a>
+        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
+    </div>
 
-<div th:if="${#lists.isEmpty(items)}">
-    <p>Je winkelmandje is leeg.</p>
+    <div class="right">
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
+
+        <span sec:authorize="isAuthenticated()">
+            Ingelogd als: <strong sec:authentication="name"></strong> |
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button>Uitloggen</button>
+            </form>
+        </span>
+    </div>
+</nav>
+
+<div class="container">
+
+    <h1>Winkelmandje</h1>
+
+    <!-- Leeg mandje -->
+    <div th:if="${#lists.isEmpty(items)}" class="empty">
+        <p>Je winkelmandje is momenteel leeg.</p>
+        <br>
+        <a href="/catalog" class="btn">Terug naar catalogus</a>
+    </div>
+
+    <!-- Gevuld mandje -->
+    <div th:if="${!#lists.isEmpty(items)}">
+
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Aantal</th>
+                <th class="text-right">Prijs per dag</th>
+                <th class="text-right">Subtotaal</th>
+                <th></th>
+            </tr>
+
+            <tr th:each="item : ${items}">
+                <td th:text="${item.product.name}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td class="text-right"
+                    th:text="${#numbers.formatDecimal(item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
+                </td>
+                <td class="text-right"
+                    th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'">
+                </td>
+                <td class="text-right">
+                    <a th:href="@{'/cart/remove/' + ${item.product.id}}" class="btn-secondary btn">
+                        Verwijderen
+                    </a>
+                </td>
+            </tr>
+        </table>
+
+        <div class="total-box">
+            <span class="total-label">Totaal per dag:</span>
+            <span class="total-amount"
+                  th:text="${#numbers.formatDecimal(total, 1,'COMMA',2,'POINT')} + ' €'"></span>
+        </div>
+
+        <div class="actions">
+            <a href="/catalog" class="btn-secondary btn">Verder winkelen</a>
+            <a href="/cart/checkout" class="btn">Verder naar checkout</a>
+        </div>
+
+    </div>
+
 </div>
-
-<table th:if="${!#lists.isEmpty(items)}" border="1" cellpadding="8">
-    <tr>
-        <th>Product</th>
-        <th>Aantal</th>
-        <th>Prijs per dag</th>
-        <th>Actie</th>
-    </tr>
-
-    <tr th:each="item : ${items}">
-        <td th:text="${item.product.name}">Naam</td>
-        <td th:text="${item.quantity}">Aantal</td>
-        <td th:text="${item.product.dailyPrice}">Prijs</td>
-        <td>
-            <a th:href="@{'/cart/remove/' + ${item.product.id}}">Verwijderen</a>
-        </td>
-    </tr>
-</table>
-
-<br>
-<a href="/catalog">Verder winkelen</a> |
-<a href="/cart/checkout">Naar checkout</a>
 
 </body>
 </html>

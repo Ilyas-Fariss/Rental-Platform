@@ -1,46 +1,155 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Registreren</title>
+    <title>Registreren - Rental Platform</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #111;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        nav {
+            background-color: #1e1e1e;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            margin-right: 18px;
+            color: #ddd;
+            font-weight: 500;
+        }
+
+        nav a:hover { color: white; }
+
+        nav form button {
+            background: transparent;
+            border: none;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type=text],
+        input[type=email],
+        input[type=password] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #1e88e5;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: #1565c0; }
+
+        .link {
+            margin-top: 15px;
+            text-align: center;
+            display: block;
+            color: #1e88e5;
+        }
+
+        .error-msg {
+            color: #b00020;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+
 </head>
+
 <body>
 
-<h1>Registreren</h1>
+<nav>
+    <div>
+        <a href="/catalog">Catalogus</a>
+        <a href="/cart">Winkelmandje</a>
+        <a href="/orders">Mijn reservaties</a>
+    </div>
 
-<div th:if="${error}">
-    <p style="color:red;" th:text="${error}"></p>
+    <div>
+        <a href="/login">Inloggen</a>
+        <a href="/register">Registreren</a>
+    </div>
+</nav>
+
+
+<div class="container">
+    <div class="card">
+
+        <h1>Account aanmaken</h1>
+
+        <div th:if="${error}" class="error-msg" th:text="${error}">
+            Foutmelding
+        </div>
+
+        <form th:action="@{/register}" method="post">
+
+            <label for="username">Gebruikersnaam</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="email">E-mailadres</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Wachtwoord</label>
+            <input type="password" id="password" name="password" required>
+
+            <button class="btn" type="submit">Registreren</button>
+        </form>
+
+        <a class="link" href="/login">Al een account? Log hier in</a>
+
+    </div>
 </div>
-
-<form th:action="@{/register}" method="post">
-
-    <div>
-        <label for="username">Gebruikersnaam:</label>
-        <input type="text" id="username" name="username" required />
-    </div>
-
-    <div>
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required />
-    </div>
-
-    <div>
-        <label for="password">Wachtwoord:</label>
-        <input type="password" id="password" name="password" required />
-    </div>
-
-    <button type="submit">Account aanmaken</button>
-
-</form>
-
-<p>
-    Heb je al een account?
-    <a href="/login">Log hier in</a>.
-</p>
-
-<p>
-    <a href="/catalog">Terug naar catalogus</a>
-</p>
 
 </body>
 </html>

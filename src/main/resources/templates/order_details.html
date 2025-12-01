@@ -5,7 +5,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Checkout - Rental Platform</title>
+    <title>Reservatie detail - Rental Platform</title>
 
     <style>
         * {
@@ -54,7 +54,7 @@
             font-size: 15px;
         }
 
-        /* PAGE CONTENT */
+        /* CONTENT */
         .container {
             width: 95%;
             max-width: 900px;
@@ -62,48 +62,59 @@
         }
 
         h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
 
-        .checkout-box {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .summary-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .summary-row {
+        .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            padding: 10px 12px;
             border-bottom: 1px solid #eee;
         }
 
-        .summary-row:last-child {
-            border-bottom: none;
+        table th {
+            background-color: #f5f5f5;
+            text-align: left;
         }
 
-        .total-row {
-            font-weight: 700;
-            font-size: 17px;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 2px solid #ddd;
+        .text-right {
+            text-align: right;
         }
 
         .btn {
             display: inline-block;
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 6px;
             background-color: #1e88e5;
             color: white;
-            font-size: 15px;
+            font-size: 14px;
             border: none;
             cursor: pointer;
         }
@@ -121,15 +132,13 @@
             background-color: #c5c5c5;
         }
 
-        .buttons {
-            margin-top: 25px;
+        .actions {
             display: flex;
-            justify-content: space-between;
             gap: 10px;
+            margin-top: 15px;
         }
 
-        .buttons a,
-        .buttons button {
+        .actions a {
             flex: 1;
             text-align: center;
         }
@@ -139,7 +148,6 @@
 
 <body>
 
-<!-- NAVBAR -->
 <nav>
     <div>
         <a href="/catalog">Catalogus</a>
@@ -162,39 +170,62 @@
     </div>
 </nav>
 
-
 <div class="container">
 
-    <h1>Checkout</h1>
+    <h1>Reservatie bevestigd</h1>
+    <p class="subtitle">
+        Bedankt voor je reservatie. Hieronder vind je het overzicht van je bestelling.
+    </p>
 
-    <div class="checkout-box">
-
-        <div class="summary-title">Overzicht</div>
-
-        <!-- ITEM OVERZICHT -->
-        <div th:each="item : ${items}" class="summary-row">
-            <span th:text="${item.product.name}"></span>
-            <span>
-                <span th:text="'x ' + ${item.quantity}"></span> ·
-                <span th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'"></span>
-            </span>
+    <div class="card">
+        <div class="info-row">
+            <span class="info-label">Ordernummer:</span>
+            <span th:text="${order.id}">1</span>
         </div>
 
-        <!-- TOTAAL -->
-        <div class="summary-row total-row">
-            <span>Totaal per dag:</span>
-            <span th:text="${#numbers.formatDecimal(total, 1,'COMMA',2,'POINT')} + ' €'"></span>
+        <div class="info-row">
+            <span class="info-label">Datum:</span>
+            <span th:text="${order.createdAt}">2025-01-01</span>
         </div>
 
-        <!-- KNOPPEN -->
-        <div class="buttons">
-            <a href="/cart" class="btn-secondary btn">Terug naar mandje</a>
-
-            <form th:action="@{/orders/confirm}" method="get">
-                <button class="btn">Bevestigen</button>
-            </form>
+        <div class="info-row">
+            <span class="info-label">Aantal items:</span>
+            <span th:text="${order.totalItems}">0</span>
         </div>
 
+        <div class="info-row">
+            <span class="info-label">Totaal per dag:</span>
+            <span th:text="${#numbers.formatDecimal(order.totalPrice, 1,'COMMA',2,'POINT')} + ' €'">0 €</span>
+        </div>
+
+        <h3 style="margin-top: 20px; margin-bottom: 10px;">Gereserveerde materialen</h3>
+
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Aantal</th>
+                <th class="text-right">Prijs/dag</th>
+                <th class="text-right">Subtotaal</th>
+            </tr>
+
+            <tr th:each="item : ${order.items}">
+                <td th:text="${item.product.name}">Naam</td>
+                <td th:text="${item.quantity}">1</td>
+                <td class="text-right"
+                    th:text="${#numbers.formatDecimal(item.priceAtTime, 1,'COMMA',2,'POINT')} + ' €'">
+                    0 €
+                </td>
+                <td class="text-right"
+                    th:text="${#numbers.formatDecimal(item.priceAtTime * item.quantity, 1,'COMMA',2,'POINT')} + ' €'">
+                    0 €
+                </td>
+            </tr>
+        </table>
+
+        <div class="actions">
+            <a href="/orders" class="btn-secondary btn">Naar mijn reservaties</a>
+            <a href="/catalog" class="btn">Verder materiaal reserveren</a>
+        </div>
     </div>
 
 </div>

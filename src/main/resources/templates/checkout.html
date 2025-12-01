@@ -1,25 +1,203 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>Bevestiging</title>
+    <title>Checkout - Rental Platform</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #111;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* NAVBAR */
+        nav {
+            background-color: #1e1e1e;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            margin-right: 18px;
+            color: #ddd;
+            font-weight: 500;
+        }
+
+        nav a:hover,
+        nav form button:hover {
+            color: white;
+        }
+
+        nav form button {
+            background: transparent;
+            border: none;
+            color: #ddd;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        /* PAGE CONTENT */
+        .container {
+            width: 95%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .checkout-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .total-row {
+            font-weight: 700;
+            font-size: 17px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #ddd;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 6px;
+            background-color: #1e88e5;
+            color: white;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #1565c0;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #c5c5c5;
+        }
+
+        .buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .buttons a,
+        .buttons button {
+            flex: 1;
+            text-align: center;
+        }
+
+    </style>
 </head>
+
 <body>
 
-<h1>Bevestiging van je reservatie</h1>
+<!-- NAVBAR -->
+<nav>
+    <div>
+        <a href="/catalog">Catalogus</a>
+        <a href="/cart">Winkelmandje</a>
+        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
+    </div>
 
-<p>Hier is een overzicht van je gekozen materiaal:</p>
+    <div>
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
 
-<ul>
-    <li th:each="item : ${items}">
-        <span th:text="${item.product.name}"></span> -
-        <strong th:text="${item.quantity}"></strong> stuks
-    </li>
-</ul>
+        <span sec:authorize="isAuthenticated()">
+            Ingelogd als: <strong sec:authentication="name"></strong> |
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button>Uitloggen</button>
+            </form>
+        </span>
+    </div>
+</nav>
 
-<p>Dit is een simpele checkout. Later kunnen we echte reservatiedata, datums en user accounts toevoegen.</p>
 
-<a href="/catalog">Terug naar catalogus</a>
+<div class="container">
+
+    <h1>Checkout</h1>
+
+    <div class="checkout-box">
+
+        <div class="summary-title">Overzicht</div>
+
+        <!-- ITEM OVERZICHT -->
+        <div th:each="item : ${items}" class="summary-row">
+            <span th:text="${item.product.name}"></span>
+            <span>
+                <span th:text="'x ' + ${item.quantity}"></span> ·
+                <span th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'"></span>
+            </span>
+        </div>
+
+        <!-- TOTAAL -->
+        <div class="summary-row total-row">
+            <span>Totaal per dag:</span>
+            <span th:text="${#numbers.formatDecimal(total, 1,'COMMA',2,'POINT')} + ' €'"></span>
+        </div>
+
+        <!-- KNOPPEN -->
+        <div class="buttons">
+            <a href="/cart" class="btn-secondary btn">Terug naar mandje</a>
+
+            <form th:action="@{/orders/confirm}" method="get">
+                <button class="btn">Bevestigen</button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 </html>
