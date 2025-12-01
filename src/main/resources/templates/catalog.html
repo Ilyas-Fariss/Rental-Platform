@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Catalogus - Rental Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        header { margin-bottom: 20px; }
+        .filters { margin-bottom: 20px; }
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .product-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .product-card h3 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #eee;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        button { padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Catalogus</h1>
+    <p>Bekijk hier het beschikbare materiaal dat je kan huren.</p>
+</header>
+
+<section class="filters">
+    <form method="get" th:action="@{/catalog}">
+        <label for="category">Categorie:</label>
+        <select name="categoryId" id="category">
+            <option value="">Alle categorieën</option>
+            <option th:each="cat : ${categories}"
+                    th:value="${cat.id}"
+                    th:text="${cat.name}">
+            </option>
+        </select>
+
+        <label for="search" style="margin-left: 10px;">Zoek:</label>
+        <input type="text" id="search" name="search" th:value="${search}"/>
+
+        <button type="submit">Filter</button>
+    </form>
+</section>
+
+<section class="product-list">
+    <div th:if="${#lists.isEmpty(products)}">
+        Geen producten gevonden.
+    </div>
+
+    <div th:each="product : ${products}" class="product-card">
+        <h3 th:text="${product.name}">Productnaam</h3>
+        <p th:text="${product.description}">Beschrijving</p>
+        <p>
+            <span class="badge"
+                  th:text="${product.category.name}">
+                Categorie
+            </span>
+        </p>
+        <p>
+            Prijs per dag:
+            <strong th:text="${product.dailyPrice}">0.0</strong> €
+        </p>
+        <p th:text="'Voorraad: ' + ${product.stock}">Voorraad</p>
+
+        <a th:href="@{'/cart/add/' + ${product.id}}">
+            <button type="button">Toevoegen aan mandje</button>
+        </a>
+
+    </div>
+</section>
+
+</body>
+</html>
