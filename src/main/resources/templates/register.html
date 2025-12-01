@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registreren</title>
+</head>
+<body>
+
+<h1>Registreren</h1>
+
+<div th:if="${error}">
+    <p style="color:red;" th:text="${error}"></p>
+</div>
+
+<form th:action="@{/register}" method="post">
+
+    <div>
+        <label for="username">Gebruikersnaam:</label>
+        <input type="text" id="username" name="username" required />
+    </div>
+
+    <div>
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required />
+    </div>
+
+    <div>
+        <label for="password">Wachtwoord:</label>
+        <input type="password" id="password" name="password" required />
+    </div>
+
+    <button type="submit">Account aanmaken</button>
+
+</form>
+
+<p>
+    Heb je al een account?
+    <a href="/login">Log hier in</a>.
+</p>
+
+<p>
+    <a href="/catalog">Terug naar catalogus</a>
+</p>
+
+</body>
+</html>
