@@ -125,7 +125,37 @@
 <nav>
     <div>
         <a href="/catalog">Catalogus</a>
-        <a href="/cart">Winkelmandje</a>
+
+        <a href="/cart" style="position: relative; display: inline-block;">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 height="22"
+                 width="22"
+                 style="vertical-align: middle;">
+                <path fill="#ddd"
+                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
+                         0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
+                         14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
+                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22 4.76 4 4.38
+                         4H2v2h1l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+            </svg>
+
+            <span th:if="${cartCount > 0}"
+                  th:text="${cartCount}"
+                  style="
+                      position: absolute;
+                      top: -6px;
+                      right: -10px;
+                      background-color: #43a047;
+                      color: white;
+                      padding: 2px 7px;
+                      font-size: 12px;
+                      border-radius: 50%;
+                      font-weight: bold;
+                  ">
+            </span>
+        </a>
+
         <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
     </div>
 
