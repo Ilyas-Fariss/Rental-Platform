@@ -1,230 +1,302 @@
 <!DOCTYPE html>
-<html lang="nl"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-
+<html lang="nl" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Checkout - Rental Platform</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
 
     <style>
-        * {
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f3f4f6;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #111;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        nav {
-            background-color: #1e1e1e;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        nav a {
-            margin-right: 18px;
-            color: #ddd;
-            font-weight: 500;
-        }
-
-        nav a:hover,
-        nav form button:hover {
-            color: white;
-        }
-
-        nav form button {
-            background: transparent;
-            border: none;
-            color: #ddd;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .container {
-            width: 95%;
-            max-width: 900px;
-            margin: 30px auto;
+        .page-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 16px;
         }
 
         h1 {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            font-size: 14px;
         }
 
-        .checkout-box {
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
             background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 20px 22px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
         }
 
-        .summary-title {
-            font-size: 18px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        thead th {
+            border-bottom: 1px solid #e5e7eb;
             font-weight: 600;
-            margin-bottom: 15px;
+            color: #6b7280;
+        }
+
+        tbody tr + tr {
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .product-name {
+            font-weight: 600;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .qty {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .price {
+            font-variant-numeric: tabular-nums;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+            margin-top: 8px;
+            font-size: 14px;
         }
 
-        .summary-row:last-child {
-            border-bottom: none;
-        }
-
-        .total-row {
+        .summary-row.total {
             font-weight: 700;
-            font-size: 17px;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 2px solid #ddd;
+            font-size: 16px;
+            margin-top: 12px;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 10px 16px;
-            border-radius: 6px;
-            background-color: #1e88e5;
-            color: white;
-            font-size: 15px;
+        .summary-label {
+            color: #6b7280;
+        }
+
+        .summary-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 9px 18px;
             border: none;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
         }
 
-        .btn:hover {
-            background-color: #1565c0;
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.35);
         }
 
         .btn-secondary {
-            background-color: #e0e0e0;
-            color: #333;
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
         }
 
         .btn-secondary:hover {
-            background-color: #c5c5c5;
+            background: #f9fafb;
         }
 
-        .buttons {
-            margin-top: 25px;
+        .btn-link {
+            background: transparent;
+            color: #6b7280;
+            padding-left: 0;
+        }
+
+        .btn-link:hover {
+            color: #111827;
+        }
+
+        .summary-actions {
+            margin-top: 18px;
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
             gap: 10px;
         }
 
-        .buttons a,
-        .buttons button {
-            flex: 1;
+        .empty-state {
             text-align: center;
+            padding: 40px 12px;
+            color: #6b7280;
         }
 
+        .empty-state h2 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .empty-state p {
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
     </style>
 </head>
-
 <body>
-
-<nav>
-    <div>
-        <a href="/catalog">Catalogus</a>
-
-        <a href="/cart" style="position: relative; display: inline-block;">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 height="22"
-                 width="22"
-                 style="vertical-align: middle;">
-                <path fill="#ddd"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
-                         0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
-                         14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22 4.76 4 4.38
-                         4H2v2h1l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
-            </svg>
-
-            <span th:if="${cartCount > 0}"
-                  th:text="${cartCount}"
-                  style="
-                      position: absolute;
-                      top: -6px;
-                      right: -10px;
-                      background-color: #43a047;
-                      color: white;
-                      padding: 2px 7px;
-                      font-size: 12px;
-                      border-radius: 50%;
-                      font-weight: bold;
-                  ">
-            </span>
-        </a>
-
-        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
-    </div>
-
-    <div>
-        <span sec:authorize="!isAuthenticated()">
-            <a href="/login">Inloggen</a>
-            <a href="/register">Registreren</a>
-        </span>
-
-        <span sec:authorize="isAuthenticated()">
-            Ingelogd als: <strong sec:authentication="name"></strong> |
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button>Uitloggen</button>
-            </form>
-        </span>
-    </div>
-</nav>
-
-
-<div class="container">
-
+<div class="page-container">
     <h1>Checkout</h1>
+    <p class="subtitle">Controleer hieronder je reservatie voordat je definitief bevestigt.</p>
 
-    <div class="checkout-box">
+    <!-- Foutmelding -->
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <!-- Eventuele success-melding via redirectAttributes -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-        <div class="summary-title">Overzicht</div>
+    <div class="checkout-layout">
+        <!-- Linkerkant: overzicht items -->
+        <div class="card">
+            <h2 style="margin-top: 0; margin-bottom: 16px; font-size: 18px;">Geselecteerde materialen</h2>
 
-        <!-- ITEM OVERZICHT -->
-        <div th:each="item : ${items}" class="summary-row">
-            <span th:text="${item.product.name}"></span>
-            <span>
-                <span th:text="'x ' + ${item.quantity}"></span> ·
-                <span th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'"></span>
-            </span>
+            <div th:if="${#lists.isEmpty(items)}" class="empty-state">
+                <h2>Je winkelmandje is leeg</h2>
+                <p>Keer terug naar de catalogus om materiaal te kiezen voor je project.</p>
+                <a th:href="@{/catalog}" class="btn-secondary">Naar catalogus</a>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(items)}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Aantal</th>
+                        <th>Prijs per dag</th>
+                        <th>Totaal</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${items}">
+                        <td>
+                            <div class="product-name" th:text="${item.product.name}"></div>
+                            <div class="tag" th:text="${item.product.category.name}">Categorie</div>
+                        </td>
+                        <td class="qty" th:text="${item.quantity}">1</td>
+                        <td class="price"
+                            th:text="${#numbers.formatDecimal(item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
+                            0,00 €
+                        </td>
+                        <td class="price"
+                            th:text="${#numbers.formatDecimal(item.quantity * item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
+                            0,00 €
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- TOTAAL -->
-        <div class="summary-row total-row">
-            <span>Totaal per dag:</span>
-            <span th:text="${#numbers.formatDecimal(total, 1,'COMMA',2,'POINT')} + ' €'"></span>
+        <!-- Rechterkant: samenvatting + knop bevestigen -->
+        <div class="card">
+            <h2 style="margin-top: 0; margin-bottom: 16px; font-size: 18px;">Samenvatting</h2>
+
+            <div th:if="${#lists.isEmpty(items)}">
+                <p style="color:#6b7280; font-size:14px;">
+                    Er staan momenteel geen items in je mandje.
+                </p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(items)}">
+                <div class="summary-row">
+                    <div class="summary-label">Aantal verschillende items</div>
+                    <div class="summary-value" th:text="${#lists.size(items)} + ' producten'">0 producten</div>
+                </div>
+
+                <div class="summary-row total">
+                    <div class="summary-label">Totale dagprijs</div>
+                    <div class="summary-value"
+                         th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')} + ' € / dag'">
+                        0,00 € / dag
+                    </div>
+                </div>
+
+                <div class="summary-actions">
+                    <form th:action="@{/cart/checkout/confirm}" method="post">
+                        <button type="submit" class="btn-primary">
+                            Reservatie definitief bevestigen
+                        </button>
+                    </form>
+
+                    <a th:href="@{/cart}" class="btn-secondary">Terug naar winkelmandje</a>
+
+                    <a th:href="@{/catalog}" class="btn-link">Verder winkelen</a>
+                </div>
+
+                <p style="margin-top: 20px; font-size: 12px; color: #6b7280;">
+                    Opmerking: prijzen zijn per dag huur. In deze proof-of-concept wordt nog geen effectieve
+                    betaalmethode geïntegreerd, enkel de reservatie van materiaal.
+                </p>
+            </div>
         </div>
-
-        <!-- KNOPPEN -->
-        <div class="buttons">
-            <a href="/cart" class="btn-secondary btn">Terug naar mandje</a>
-
-            <form th:action="@{/orders/confirm}" method="get">
-                <button class="btn">Bevestigen</button>
-            </form>
-        </div>
-
     </div>
-
 </div>
-
 </body>
 </html>

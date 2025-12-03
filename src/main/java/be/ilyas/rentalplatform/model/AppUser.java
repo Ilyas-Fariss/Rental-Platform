@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,12 +19,23 @@ public class AppUser implements UserDetails {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String password; // opgeslagen als BCrypt hash
+    private String password; // BCrypt hash
 
-    private String role = "ROLE_USER"; // standaard rol
+    @Column(nullable = false)
+    private String role = "ROLE_USER";
+
+    // Nieuwe profielvelden
+    private String firstName;
+    private String lastName;
+
+    private LocalDate dateOfBirth;
+
+    // Bestandsnaam van de profielfoto (in uploads/profile)
+    private String profileImage;
 
     public AppUser() {
     }
@@ -34,6 +46,8 @@ public class AppUser implements UserDetails {
         this.password = password;
         this.role = role;
     }
+
+    // --------- Basis getters/setters ---------
 
     public Long getId() {
         return id;
@@ -47,11 +61,13 @@ public class AppUser implements UserDetails {
         this.email = email;
     }
 
-    // ----- UserDetails implementatie -----
-
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
@@ -63,16 +79,57 @@ public class AppUser implements UserDetails {
         this.password = password;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    // --------- Profielvelden ---------
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    // --------- UserDetails-implementatie ---------
+
     @Override
-    public String getUsername() {
-        return username;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    // In deze demo zijn alle flags gewoon true
 
-    // voor deze demo zijn alle flags gewoon true
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -91,13 +148,5 @@ public class AppUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }

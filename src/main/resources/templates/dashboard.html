@@ -3,7 +3,7 @@
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Catalogus - Rental Platform</title>
+    <title>Dashboard - Rental Platform</title>
     <style>
         :root {
             --primary: #1e88e5;
@@ -23,6 +23,8 @@
             background: var(--bg);
             color: var(--text-main);
         }
+
+        /* NAVBAR */
 
         .navbar {
             background: var(--nav-bg);
@@ -92,7 +94,9 @@
 
         .icon-button svg { display: block; }
 
-        .icon-button:hover { background: #1f2937; }
+        .icon-button:hover {
+            background: #1f2937;
+        }
 
         .btn {
             border-radius: 999px;
@@ -116,11 +120,15 @@
             color: #e5e7eb;
         }
 
-        .btn-outline:hover { background: #1f2937; }
+        .btn-outline:hover {
+            background: #1f2937;
+        }
 
-        .nav-right form { margin: 0; }
+        .nav-right form {
+            margin: 0;
+        }
 
-        /* PAGE */
+        /* PAGE LAYOUT */
 
         .page {
             max-width: 1100px;
@@ -128,97 +136,80 @@
             padding: 0 16px 40px;
         }
 
-        h1 {
-            margin: 0 0 8px;
-            font-size: 30px;
-        }
-
-        .subtitle {
-            margin: 0 0 20px;
-            color: var(--text-muted);
-        }
-
-        .filters {
+        .hero {
+            background: linear-gradient(135deg, #1e88e5, #3b82f6);
+            color: white;
+            padding: 32px 32px 28px;
+            border-radius: 16px;
             display: flex;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.35);
+        }
+
+        .hero h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 520px;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
-            align-items: center;
-            margin-bottom: 22px;
+            align-items: flex-end;
         }
 
-        .filters label {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .filters select,
-        .filters input[type="text"] {
-            padding: 7px 9px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-            font-size: 14px;
-        }
-
-        .product-grid {
+        .quick-links {
+            margin-top: 28px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            gap: 18px;
         }
 
-        .product-card {
+        .card {
             background: var(--card-bg);
             border-radius: 14px;
             padding: 18px 18px 20px;
             box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
         }
 
-        .product-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 0;
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 19px;
         }
 
-        .product-category {
-            display: inline-block;
-            background: #e5e7eb;
-            color: #374151;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .product-desc {
-            margin: 4px 0 6px;
+        .card p {
+            margin: 0 0 10px;
             color: var(--text-muted);
             font-size: 14px;
         }
 
-        .product-meta {
+        .rules-list {
+            margin: 8px 0 0;
+            padding-left: 18px;
+            color: var(--text-muted);
             font-size: 14px;
         }
 
-        .product-meta strong { font-weight: 700; }
-
-        .product-actions {
-            margin-top: 10px;
-        }
-
-        .empty-state {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 10px;
-            background: #e5e7eb;
-            color: #374151;
-            font-size: 14px;
-        }
+        .rules-list li { margin-bottom: 4px; }
 
         @media (max-width: 720px) {
-            .navbar { padding-inline: 16px; }
+            .navbar {
+                padding-inline: 16px;
+            }
             .nav-center { display: none; }
+            .hero {
+                flex-direction: column;
+            }
+            .hero-actions {
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -227,6 +218,7 @@
 <nav class="navbar">
     <div class="nav-left">
         <a href="/cart" class="brand">
+            <!-- Cart logo linksboven -->
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 24 24" width="26" height="26">
                 <path fill="#ffffff"
@@ -247,13 +239,14 @@
     </div>
 
     <div class="nav-center" sec:authorize="isAuthenticated()">
-        <a href="/dashboard" class="nav-link">Home</a>
-        <a href="/catalog" class="nav-link nav-link-active">Catalogus</a>
+        <a href="/dashboard" class="nav-link nav-link-active">Home</a>
+        <a href="/catalog" class="nav-link">Catalogus</a>
         <a href="/orders" class="nav-link">Mijn reservaties</a>
     </div>
 
     <div class="nav-right">
         <a href="/profile" class="icon-button" sec:authorize="isAuthenticated()">
+            <!-- User icon -->
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 24 24" width="22" height="22">
                 <path fill="#e5e7eb"
@@ -273,67 +266,59 @@
 </nav>
 
 <div class="page">
-    <h1>Catalogus</h1>
-    <p class="subtitle">
-        Bekijk hier al het beschikbare materiaal dat je kan reserveren.
-    </p>
-
-    <form th:action="@{/catalog}" method="get" class="filters">
+    <section class="hero">
         <div>
-            <label for="category">Categorie:</label>
-            <select id="category" name="categoryId">
-                <option value="">Alle categorieën</option>
-                <option th:each="cat : ${categories}"
-                        th:value="${cat.id}"
-                        th:text="${cat.name}"
-                        th:selected="${selectedCategoryId == cat.id}">
-                </option>
-            </select>
+            <h1 th:text="'Welkom, ' + ${username} + '!'">Welkom, gebruiker!</h1>
+            <p>
+                Dit platform ondersteunt studenten bij het reserveren en huren van technisch materiaal
+                voor projecten, repetities en eindwerken. Beheer eenvoudig je materiaal, bekijk beschikbaarheid
+                en volg je reservaties op één centrale plaats.
+            </p>
         </div>
-
-        <div>
-            <label for="search">Zoek:</label>
-            <input id="search" type="text" name="search"
-                   th:value="${searchTerm}" placeholder="Naam of beschrijving...">
+        <div class="hero-actions">
+            <a href="/catalog" class="btn btn-primary">Naar de catalogus</a>
+            <a href="/orders" class="btn btn-outline" sec:authorize="isAuthenticated()">Mijn reservaties</a>
         </div>
+    </section>
 
-        <button type="submit" class="btn btn-primary">Filter</button>
-    </form>
+    <section class="quick-links">
+        <article class="card">
+            <h2>Hoe werkt het?</h2>
+            <p>
+                Kies materiaal uit de catalogus, plaats het in je mandje en rond de reservatie af via de checkout.
+                Na bevestiging krijg je een overzicht van je reservatie.
+            </p>
+            <ul class="rules-list">
+                <li>Controleer altijd of je de juiste periode selecteert.</li>
+                <li>Reserveer enkel materiaal dat je effectief nodig hebt.</li>
+                <li>Annuleer tijdig wanneer je plannen wijzigen.</li>
+            </ul>
+        </article>
 
-    <div th:if="${products.empty}" class="empty-state">
-        Er zijn geen producten gevonden voor deze combinatie van filters.
-    </div>
+        <article class="card">
+            <h2>Spelregels materiaal</h2>
+            <p>
+                Om alles vlot te laten verlopen, vragen we om onderstaande afspraken te respecteren.
+            </p>
+            <ul class="rules-list">
+                <li>Ga zorgvuldig om met alle toestellen en accessoires.</li>
+                <li>Breng materiaal op tijd en in dezelfde staat terug.</li>
+                <li>Rapporteer schade of defecten onmiddellijk aan de verantwoordelijke.</li>
+            </ul>
+        </article>
 
-    <div class="product-grid" th:if="${!products.empty}">
-        <div class="product-card" th:each="product : ${products}">
-            <h2 class="product-name" th:text="${product.name}">Productnaam</h2>
-
-            <span class="product-category"
-                  th:text="${product.category != null ? product.category.name : 'Algemeen'}">
-                Categorie
-            </span>
-
-            <p class="product-desc" th:text="${product.description}">Beschrijving</p>
-
-            <div class="product-meta">
-                <div>
-                    <strong th:text="${#numbers.formatDecimal(product.dailyPrice, 1, 2)} + ' €/dag'">
-                        0.00 €/dag
-                    </strong>
-                </div>
-                <div>
-                    Voorraad: <span th:text="${product.stock}">0</span>
-                </div>
-            </div>
-
-            <div class="product-actions">
-                <form th:action="@{/cart/add}" method="post">
-                    <input type="hidden" name="productId" th:value="${product.id}">
-                    <button type="submit" class="btn btn-primary">Toevoegen</button>
-                </form>
-            </div>
-        </div>
-    </div>
+        <article class="card">
+            <h2>Snel naar</h2>
+            <p>
+                Handige shortcuts om meteen aan de slag te gaan met je volgende project.
+            </p>
+            <ul class="rules-list">
+                <li><a href="/catalog" class="nav-link" style="padding:0;">Bekijk de volledige catalogus</a></li>
+                <li><a href="/cart" class="nav-link" style="padding:0;">Ga naar je winkelmand</a></li>
+                <li><a href="/profile" class="nav-link" style="padding:0;">Werk je profielgegevens bij</a></li>
+            </ul>
+        </article>
+    </section>
 </div>
 
 </body>

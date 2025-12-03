@@ -1,203 +1,339 @@
 <!DOCTYPE html>
-<html lang="nl"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="nl" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Catalogus - Rental Platform</title>
-
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #1e88e5;
+            --primary-dark: #1565c0;
+            --bg: #f3f4f7;
+            --nav-bg: #111827;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #222;
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        nav {
-            background-color: #1e1e1e;
-            color: white;
-            padding: 15px 25px;
+        .navbar {
+            background: var(--nav-bg);
+            color: #ffffff;
+            padding: 12px 32px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
-        nav .left a,
-        nav .right a {
-            margin-right: 18px;
-            color: #ddd;
+        .nav-left, .nav-center, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .brand svg { display: block; }
+
+        .cart-badge {
+            position: absolute;
+            top: -4px;
+            left: 18px;
+            background: #22c55e;
+            color: #fff;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: #e5e7eb;
+            text-decoration: none;
+            font-size: 15px;
             font-weight: 500;
         }
 
-        nav .right form button {
-            background: transparent;
-            border: none;
-            color: #ddd;
+        .nav-link:hover { color: #ffffff; }
+
+        .nav-link-active {
+            color: #ffffff;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 2px;
+        }
+
+        .icon-button {
+            border-radius: 999px;
+            border: 1px solid #374151;
+            background: #111827;
+            padding: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 15px;
+            text-decoration: none;
         }
 
-        nav .left a:hover,
-        nav .right a:hover,
-        nav .right form button:hover {
-            color: white;
-        }
+        .icon-button svg { display: block; }
 
-        .container {
-            width: 95%;
-            max-width: 1100px;
-            margin: 30px auto;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            transition: 0.2s ease-in-out;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .card h3 {
-            margin-bottom: 10px;
-        }
+        .icon-button:hover { background: #1f2937; }
 
         .btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 14px;
-            border-radius: 6px;
-            background-color: #1e88e5;
+            border-radius: 999px;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
             color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #4b5563;
+            color: #e5e7eb;
+        }
+
+        .btn-outline:hover { background: #1f2937; }
+
+        .nav-right form { margin: 0; }
+
+        /* PAGE */
+
+        .page {
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 16px 40px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            margin: 0 0 20px;
+            color: var(--text-muted);
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .filters label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filters select,
+        .filters input[type="text"] {
+            padding: 7px 9px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
             font-size: 14px;
         }
 
-        .btn:hover {
-            background-color: #1565c0;
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
         }
 
-        .badge {
-            background: #eee;
-            padding: 4px 7px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin-bottom: 10px;
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 18px 18px 20px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .product-category {
             display: inline-block;
+            background: #e5e7eb;
+            color: #374151;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
-        .mb-20 { margin-bottom: 20px; }
+        .product-desc {
+            margin: 4px 0 6px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .product-meta {
+            font-size: 14px;
+        }
+
+        .product-meta strong { font-weight: 700; }
+
+        .product-actions {
+            margin-top: 10px;
+        }
+
+        .empty-state {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #e5e7eb;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        @media (max-width: 720px) {
+            .navbar { padding-inline: 16px; }
+            .nav-center { display: none; }
+        }
     </style>
 </head>
 <body>
 
-<nav>
-    <div class="left">
-        <a href="/catalog">Catalogus</a>
-
-        <a href="/cart" style="position: relative; display: inline-block;">
-            <!-- Shopping cart icoon -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/cart" class="brand">
             <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 height="22"
-                 width="22"
-                 style="vertical-align: middle;">
-                <path fill="#ddd"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
-                         0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
-                         14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22 4.76 4 4.38
-                         4H2v2h1l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+                 viewBox="0 0 24 24" width="26" height="26">
+                <path fill="#ffffff"
+                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9
+                         2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22
+                         17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.53c.75 0 1.4-.41
+                         1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
+                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22
+                         4.76 4 4.38 4H2v2h1l3.6 7.59-1.35 2.44
+                         C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
             </svg>
+            <span>Rental Platform</span>
 
-            <span th:if="${cartCount > 0}"
-                  th:text="${cartCount}"
-                  style="
-                      position: absolute;
-                      top: -6px;
-                      right: -10px;
-                      background-color: #43a047;
-                      color: white;
-                      padding: 2px 7px;
-                      font-size: 12px;
-                      border-radius: 50%;
-                      font-weight: bold;
-                  ">
-            </span>
+            <span class="cart-badge"
+                  th:if="${cartCount != null and cartCount > 0}"
+                  th:text="${cartCount}">1</span>
         </a>
-
-        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
     </div>
 
-    <div class="right">
-        <span sec:authorize="!isAuthenticated()">
-            <a href="/login">Inloggen</a>
-            <a href="/register">Registreren</a>
-        </span>
+    <div class="nav-center" sec:authorize="isAuthenticated()">
+        <a href="/dashboard" class="nav-link">Home</a>
+        <a href="/catalog" class="nav-link nav-link-active">Catalogus</a>
+        <a href="/orders" class="nav-link">Mijn reservaties</a>
+    </div>
 
-        <span sec:authorize="isAuthenticated()">
-            Ingelogd als: <strong sec:authentication="name"></strong> |
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button>Uitloggen</button>
-            </form>
-        </span>
+    <div class="nav-right">
+        <a href="/profile" class="icon-button" sec:authorize="isAuthenticated()">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24" width="22" height="22">
+                <path fill="#e5e7eb"
+                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4
+                         -4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8
+                         1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </a>
+
+        <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+            <button type="submit" class="btn btn-outline">Uitloggen</button>
+        </form>
+
+        <a href="/login" class="btn btn-primary" sec:authorize="!isAuthenticated()">Inloggen</a>
+        <a href="/register" class="btn btn-outline" sec:authorize="!isAuthenticated()">Registreren</a>
     </div>
 </nav>
 
-<div class="container">
+<div class="page">
+    <h1>Catalogus</h1>
+    <p class="subtitle">
+        Bekijk hier al het beschikbare materiaal dat je kan reserveren.
+    </p>
 
-    <h1 class="mb-20">Catalogus</h1>
-
-    <form method="get" th:action="@{/catalog}" class="mb-20">
-        <label>Categorie:</label>
-        <select name="categoryId">
-            <option value="">Alle categorieën</option>
-            <option th:each="cat : ${categories}"
-                    th:value="${cat.id}"
-                    th:text="${cat.name}">
-            </option>
-        </select>
-
-        <label style="margin-left: 10px;">Zoek:</label>
-        <input type="text" name="search" th:value="${search}" />
-
-        <button class="btn" type="submit">Filter</button>
-    </form>
-
-    <div class="grid">
-
-        <div class="card" th:each="product : ${products}">
-            <h3 th:text="${product.name}">Productnaam</h3>
-            <span class="badge" th:text="${product.category.name}">Categorie</span>
-            <p th:text="${product.description}">Beschrijving</p>
-            <p><strong th:text="${product.dailyPrice}"></strong> €/dag</p>
-            <p>Voorraad: <span th:text="${product.stock}"></span></p>
-
-            <a th:href="@{'/cart/add/' + ${product.id}}" class="btn">Toevoegen</a>
+    <form th:action="@{/catalog}" method="get" class="filters">
+        <div>
+            <label for="category">Categorie:</label>
+            <select id="category" name="categoryId">
+                <option value="">Alle categorieën</option>
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
+                        th:text="${cat.name}"
+                        th:selected="${selectedCategoryId == cat.id}">
+                </option>
+            </select>
         </div>
 
+        <div>
+            <label for="search">Zoek:</label>
+            <input id="search" type="text" name="search"
+                   th:value="${searchTerm}" placeholder="Naam of beschrijving...">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <div th:if="${products.empty}" class="empty-state">
+        Er zijn geen producten gevonden voor deze combinatie van filters.
     </div>
 
+    <div class="product-grid" th:if="${!products.empty}">
+        <div class="product-card" th:each="product : ${products}">
+            <h2 class="product-name" th:text="${product.name}">Productnaam</h2>
+
+            <span class="product-category"
+                  th:text="${product.category != null ? product.category.name : 'Algemeen'}">
+                Categorie
+            </span>
+
+            <p class="product-desc" th:text="${product.description}">Beschrijving</p>
+
+            <div class="product-meta">
+                <div>
+                    <strong th:text="${#numbers.formatDecimal(product.dailyPrice, 1, 2)} + ' €/dag'">
+                        0.00 €/dag
+                    </strong>
+                </div>
+                <div>
+                    Voorraad: <span th:text="${product.stock}">0</span>
+                </div>
+            </div>
+
+            <div class="product-actions">
+                <form th:action="@{/cart/add}" method="post">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <button type="submit" class="btn btn-primary">Toevoegen</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>

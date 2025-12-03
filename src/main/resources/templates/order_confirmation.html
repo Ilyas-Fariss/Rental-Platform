@@ -1,20 +1,120 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
-
+<html lang="nl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Order Bevestiging</title>
-</head>
+    <title>Reservatie bevestigd - Rental Platform</title>
+    <style>
+        :root{--primary:#1e88e5;--primary-dark:#1565c0;--bg:#f3f4f7;--nav-bg:#111827;--card-bg:#fff;--text-main:#111827;--text-muted:#6b7280;}
+        *{box-sizing:border-box;}
+        body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text-main);}
+        .navbar{background:var(--nav-bg);color:#fff;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;}
+        .nav-left,.nav-center,.nav-right{display:flex;align-items:center;gap:24px;}
+        .brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;color:#fff;text-decoration:none;position:relative;}
+        .brand svg{display:block;}
+        .cart-badge{position:absolute;top:-4px;left:18px;background:#22c55e;color:#fff;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;}
+        .nav-link{color:#e5e7eb;text-decoration:none;font-size:15px;font-weight:500;}
+        .nav-link:hover{color:#fff;}
+        .nav-link-active{color:#fff;border-bottom:2px solid var(--primary);padding-bottom:2px;}
+        .icon-button{border-radius:999px;border:1px solid #374151;background:#111827;padding:6px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;}
+        .icon-button:hover{background:#1f2937;}
+        .btn{border-radius:999px;border:none;padding:8px 16px;font-size:14px;font-weight:500;cursor:pointer;}
+        .btn-primary{background:var(--primary);color:#fff;}
+        .btn-primary:hover{background:var(--primary-dark);}
+        .btn-outline{background:transparent;border:1px solid #4b5563;color:#e5e7eb;}
+        .btn-outline:hover{background:#1f2937;}
+        .nav-right form{margin:0;}
 
+        .page{max-width:800px;margin:32px auto;padding:0 16px 40px;}
+        .card{background:var(--card-bg);border-radius:14px;padding:24px 24px 26px;box-shadow:0 12px 28px rgba(15,23,42,0.2);text-align:left;}
+        .title{font-size:24px;font-weight:700;margin:0 0 4px;}
+        .subtitle{margin:0 0 18px;color:var(--text-muted);}
+        .pill{display:inline-block;background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;margin-bottom:12px;}
+        .meta{font-size:14px;color:var(--text-muted);margin-bottom:12px;}
+        .total{margin-top:12px;font-size:16px;font-weight:600;}
+        .actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;}
+    </style>
+</head>
 <body>
 
-<h1>Bestelling bevestigd!</h1>
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/cart" class="brand">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24" width="26" height="26">
+                <path fill="#ffffff"
+                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9
+                         2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22
+                         17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.53c.75 0 1.4-.41
+                         1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
+                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22
+                         4.76 4 4.38 4H2v2h1l3.6 7.59-1.35 2.44
+                         C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+            </svg>
+            <span>Rental Platform</span>
+            <span class="cart-badge"
+                  th:if="${cartCount != null and cartCount > 0}"
+                  th:text="${cartCount}">1</span>
+        </a>
+    </div>
 
-<p>Order ID: <span th:text="${order.id}"></span></p>
-<p>Totaal bedrag: <span th:text="${order.totalPrice}"></span> €</p>
-<p>Aantal items: <span th:text="${order.items.size()}"></span></p>
+    <div class="nav-center" sec:authorize="isAuthenticated()">
+        <a href="/dashboard" class="nav-link">Home</a>
+        <a href="/catalog" class="nav-link">Catalogus</a>
+        <a href="/orders" class="nav-link nav-link-active">Mijn reservaties</a>
+    </div>
 
-<a href="/catalog">Terug naar catalogus</a>
+    <div class="nav-right">
+        <a href="/profile" class="icon-button" sec:authorize="isAuthenticated()">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24" width="22" height="22">
+                <path fill="#e5e7eb"
+                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4
+                         -4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8
+                         1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </a>
+        <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+            <button type="submit" class="btn btn-outline">Uitloggen</button>
+        </form>
+        <a href="/login" class="btn btn-primary" sec:authorize="!isAuthenticated()">Inloggen</a>
+        <a href="/register" class="btn btn-outline" sec:authorize="!isAuthenticated()">Registreren</a>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="card" th:if="${order != null}">
+        <div class="pill">Reservatie bevestigd</div>
+        <h1 class="title" th:text="'Reservatie #' + ${order.id}">Reservatie #1</h1>
+        <p class="subtitle">
+            Je reservatie werd succesvol geregistreerd in het systeem.
+        </p>
+
+        <div class="meta">
+            Datum: <span th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}">01/01/2025</span><br>
+            Aantal items: <span th:text="${order.totalItems}">0</span>
+        </div>
+
+        <div class="total">
+            <span>Totaalprijs per dag</span>
+            <span th:text="${#numbers.formatDecimal(order.totalPrice,1,2) + ' €'}">0.00 €</span>
+        </div>
+
+        <div class="actions">
+            <a th:href="@{'/orders/' + ${order.id}}" class="btn btn-primary">Details bekijken</a>
+            <a href="/catalog" class="btn btn-outline" style="border-color:#d1d5db;color:#111827;">
+                Terug naar catalogus
+            </a>
+        </div>
+    </div>
+
+    <div class="card" th:if="${order == null}">
+        Er ging iets mis bij het aanmaken van de reservatie. Probeer opnieuw.
+        <div style="margin-top:12px;">
+            <a href="/cart" class="btn btn-primary">Terug naar winkelmand</a>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
