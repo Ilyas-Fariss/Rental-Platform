@@ -8,56 +8,141 @@
     <title>Checkout - Rental Platform</title>
 
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',Arial;background:#f4f6f8;color:#111;}
-        a{text-decoration:none;color:inherit;}
+        /* BASE */
+        *{ margin:0; padding:0; box-sizing:border-box; }
+        body{
+            font-family:'Segoe UI',Arial,sans-serif;
+            background:#f4f6f8;
+            color:#111;
+        }
+        a{ text-decoration:none; color:inherit; }
 
+        /* NAVBAR */
         nav{
-            background:#1c1c1c;color:white;padding:15px 26px;
-            display:flex;justify-content:space-between;align-items:center;
+            background:#1c1c1c;
+            color:white;
+            padding:15px 26px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
             box-shadow:0 2px 8px rgba(0,0,0,0.35);
+            animation:fadeDown .4s ease;
         }
-        nav a{margin-right:18px;color:#d6d6d6;font-weight:500;transition:.2s;}
-        nav a:hover{color:#fff;}
-        nav form button{background:none;border:none;color:#ddd;font-size:15px;cursor:pointer;}
-        nav form button:hover{color:#fff;}
+        @keyframes fadeDown{
+            from{ opacity:0; transform:translateY(-10px); }
+            to  { opacity:1; transform:translateY(0); }
+        }
 
-        .container{width:95%;max-width:1100px;margin:35px auto;}
-        h1{margin-bottom:20px;}
+        nav a{
+            margin-right:18px;
+            color:#d6d6d6;
+            font-weight:500;
+            transition:.2s;
+        }
+        nav a:hover{ color:white; }
 
+        nav form button{
+            background:none;
+            border:none;
+            color:#d6d6d6;
+            cursor:pointer;
+            font-size:15px;
+            transition:.2s;
+        }
+        nav form button:hover{ color:white; }
+
+        /* LAYOUT */
+        .container{
+            width:95%;
+            max-width:1100px;
+            margin:35px auto;
+            animation:fadeIn .35s ease-out;
+        }
+        @keyframes fadeIn{
+            from{ opacity:0; transform:translateY(12px); }
+            to  { opacity:1; transform:translateY(0); }
+        }
+
+        h1{ margin-bottom:20px; }
+
+        /* CHECKOUT BOX */
         .checkout-box{
-            background:white;padding:25px;border-radius:12px;
+            background:white;
+            padding:25px;
+            border-radius:12px;
             box-shadow:0 3px 10px rgba(0,0,0,0.12);
+            animation:fadeUp .4s ease;
+        }
+        @keyframes fadeUp{
+            from{ opacity:0; transform:translateY(12px); }
+            to  { opacity:1; transform:translateY(0); }
         }
 
-        .summary-title{font-size:18px;font-weight:700;margin-bottom:15px;}
+        .summary-title{
+            font-size:18px;
+            font-weight:700;
+            margin-bottom:15px;
+        }
 
         .summary-row{
-            display:flex;justify-content:space-between;
-            padding:10px 0;border-bottom:1px solid #ececec;
+            display:flex;
+            justify-content:space-between;
+            padding:10px 0;
+            border-bottom:1px solid #ececec;
         }
-        .summary-row:last-child{border-bottom:none;}
+        .summary-row:last-child{
+            border-bottom:none;
+        }
 
         .total-row{
-            font-weight:700;font-size:17px;margin-top:10px;
-            padding-top:12px;border-top:2px solid #ddd;
+            font-weight:700;
+            font-size:17px;
+            margin-top:10px;
+            padding-top:12px;
+            border-top:2px solid #ddd;
         }
 
+        /* BUTTONS */
         .btn{
-            padding:10px 16px;border-radius:7px;background:#1e88e5;
-            color:white;font-weight:600;font-size:15px;
-            cursor:pointer;border:none;transition:.2s;
+            padding:10px 16px;
+            border-radius:7px;
+            background:#1e88e5;
+            color:white;
+            font-weight:600;
+            font-size:15px;
+            cursor:pointer;
+            border:none;
+            transition:.2s;
+            display:inline-block;
+            text-align:center;
         }
-        .btn:hover{background:#1565c0;}
+        .btn:hover{
+            background:#1565c0;
+            transform:translateY(-1px);
+        }
+        .btn:active{
+            transform:scale(0.97);
+        }
 
         .btn-secondary{
-            background:#e0e0e0;color:#333;
+            background:#e0e0e0;
+            color:#333;
         }
-        .btn-secondary:hover{background:#c5c5c5;}
+        .btn-secondary:hover{
+            background:#c5c5c5;
+        }
 
-        .buttons{display:flex;gap:12px;margin-top:25px;}
-        .buttons a,.buttons button{flex:1;text-align:center;}
+        .buttons{
+            display:flex;
+            gap:12px;
+            margin-top:25px;
+        }
+        .buttons a,
+        .buttons button{
+            flex:1;
+        }
     </style>
+
 </head>
 
 <body>
@@ -67,13 +152,18 @@
         <a href="/catalog">Catalogus</a>
 
         <a href="/cart" style="position:relative;display:inline-block;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                 height="22" width="22">
-                <path fill="#d6d6d6" d="M7 18c-1.1..."/>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24" height="22" width="22">
+                <path fill="#d6d6d6"
+                      d="M7 18c-1.1..."/>
             </svg>
+
             <span th:if="${cartCount>0}" th:text="${cartCount}"
-                  style="position:absolute;top:-6px;right:-10px;background:#43a047;
-                  color:white;padding:3px 7px;font-size:11px;border-radius:50%;font-weight:700;">
+                  style="
+                      position:absolute;top:-6px;right:-10px;
+                      background:#43a047;color:white;
+                      padding:3px 7px;font-size:11px;border-radius:50%;
+                      font-weight:700;">
             </span>
         </a>
 
@@ -82,7 +172,8 @@
 
     <div>
         <span sec:authorize="!isAuthenticated()">
-            <a href="/login">Inloggen</a><a href="/register">Registreren</a>
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
         </span>
 
         <span sec:authorize="isAuthenticated()">
@@ -106,7 +197,8 @@
             <span th:text="${item.product.name}"></span>
             <span>
                 x <span th:text="${item.quantity}"></span> •
-                <span th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity,1,'COMMA',2,'POINT')} + ' €'"></span>
+                <span th:text="${#numbers.formatDecimal(
+                    item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'"></span>
             </span>
         </div>
 
@@ -122,7 +214,9 @@
                 <button class="btn">Bevestigen</button>
             </form>
         </div>
+
     </div>
+
 </div>
 
 </body>
