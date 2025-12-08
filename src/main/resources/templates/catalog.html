@@ -2,173 +2,273 @@
 <html lang="nl"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>Catalogus - Rental Platform</title>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ============================================
+           GLOBAL BASE STYLE (consistent across project)
+           ============================================ */
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #222;
+            background: #f4f6f8;
+            color: #111;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+        a { text-decoration: none; color: inherit; }
 
+        /* ============================================
+           NAVBAR
+           ============================================ */
         nav {
-            background-color: #1e1e1e;
+            background: #1c1c1c;
             color: white;
-            padding: 15px 25px;
+            padding: 15px 26px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
         }
 
-        nav .left a,
-        nav .right a {
+        nav a {
             margin-right: 18px;
-            color: #ddd;
+            color: #d6d6d6;
             font-weight: 500;
+            transition: .2s ease;
         }
 
-        nav .right form button {
+        nav a:hover { color: #fff; }
+
+        nav form button {
             background: transparent;
             border: none;
-            color: #ddd;
+            color: #d6d6d6;
             cursor: pointer;
             font-size: 15px;
+            transition: .2s;
         }
 
-        nav .left a:hover,
-        nav .right a:hover,
-        nav .right form button:hover {
-            color: white;
-        }
+        nav form button:hover { color: #fff; }
 
+        /* ============================================
+           LAYOUT
+           ============================================ */
         .container {
             width: 95%;
-            max-width: 1100px;
-            margin: 30px auto;
+            max-width: 1200px;
+            margin: 35px auto;
+            animation: fadeIn 0.4s ease-out;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { margin-bottom: 20px; font-weight: 700; }
+
+        /* ============================================
+           FILTER BAR
+           ============================================ */
+        .filters {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            margin-bottom: 26px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideDown .4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .filters label { font-weight: 600; margin-right: 6px; }
+
+        .filters select,
+        .filters input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .filters select:focus,
+        .filters input:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 2px rgba(30,136,229,0.25);
+            outline: none;
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            padding: 9px 15px;
+            border-radius: 7px;
+            background: #1e88e5;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: .2s ease;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #1565c0;
+            transform: translateY(-1px);
+        }
+
+        /* Subtle ripple on click */
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ============================================
+           PRODUCT GRID
+           ============================================ */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
+            gap: 22px;
         }
 
         .card {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            transition: 0.2s ease-in-out;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            transition: .25s ease;
+            opacity: 0;
+            animation: fadeUp 0.5s forwards;
         }
 
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.18);
         }
 
-        .card h3 {
-            margin-bottom: 10px;
-        }
-
-        .btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 14px;
-            border-radius: 6px;
-            background-color: #1e88e5;
-            color: white;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            background-color: #1565c0;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .badge {
-            background: #eee;
-            padding: 4px 7px;
-            border-radius: 4px;
+            background: #e7e7e7;
+            padding: 5px 9px;
+            border-radius: 6px;
             font-size: 12px;
-            margin-bottom: 10px;
             display: inline-block;
+            margin-bottom: 10px;
         }
 
-        .mb-20 { margin-bottom: 20px; }
+        .price {
+            font-weight: 700;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .info { font-size: 14px; margin-bottom: 10px; }
+
+        /* ============================================
+           SNACKBAR (TOEGEVOEGD AAN MANDJE)
+           ============================================ */
+        #snackbar {
+            visibility: hidden;
+            min-width: 260px;
+            background-color: #323232;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity .4s, bottom .4s;
+        }
+
+        #snackbar.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
     </style>
+
+    <script>
+        function showSnackbar() {
+            let bar = document.getElementById('snackbar');
+            bar.classList.add('show');
+            setTimeout(() => bar.classList.remove('show'), 2500);
+        }
+    </script>
+
 </head>
+
 <body>
 
 <nav>
-    <div class="left">
+    <div>
         <a href="/catalog">Catalogus</a>
 
         <a href="/cart" style="position: relative; display: inline-block;">
-            <!-- Shopping cart icoon -->
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 height="22"
-                 width="22"
-                 style="vertical-align: middle;">
-                <path fill="#ddd"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
-                         0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
-                         14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22 4.76 4 4.38
-                         4H2v2h1l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 height="22" width="22">
+                <path fill="#d6d6d6"
+                      d="M7 18c-1.1 0-1.99..."/>
             </svg>
 
-            <span th:if="${cartCount > 0}"
-                  th:text="${cartCount}"
+            <span th:if="${cartCount>0}" th:text="${cartCount}"
                   style="
-                      position: absolute;
-                      top: -6px;
-                      right: -10px;
-                      background-color: #43a047;
-                      color: white;
-                      padding: 2px 7px;
-                      font-size: 12px;
-                      border-radius: 50%;
-                      font-weight: bold;
-                  ">
+                      position:absolute;top:-6px;right:-10px;
+                      background:#43a047;color:white;
+                      padding:3px 7px;font-size:11px;border-radius:50%;
+                      font-weight:700;">
             </span>
         </a>
 
         <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
     </div>
 
-    <div class="right">
+    <div>
         <span sec:authorize="!isAuthenticated()">
             <a href="/login">Inloggen</a>
             <a href="/register">Registreren</a>
         </span>
 
         <span sec:authorize="isAuthenticated()">
-            Ingelogd als: <strong sec:authentication="name"></strong> |
+            Ingelogd als <strong sec:authentication="name"></strong> |
             <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button>Uitloggen</button>
+                <button style="background:none;border:none;color:#d6d6d6;">Uitloggen</button>
             </form>
         </span>
     </div>
 </nav>
 
+<!-- Snackbar -->
+<div id="snackbar">Toegevoegd aan winkelmandje!</div>
+
 <div class="container">
 
-    <h1 class="mb-20">Catalogus</h1>
+    <h1>Catalogus</h1>
 
-    <form method="get" th:action="@{/catalog}" class="mb-20">
+    <form method="get" th:action="@{/catalog}" class="filters">
         <label>Categorie:</label>
         <select name="categoryId">
             <option value="">Alle categorieën</option>
@@ -178,24 +278,34 @@
             </option>
         </select>
 
-        <label style="margin-left: 10px;">Zoek:</label>
-        <input type="text" name="search" th:value="${search}" />
+        <label>Zoek:</label>
+        <input type="text" name="search" th:value="${search}" placeholder="Zoek product...">
 
-        <button class="btn" type="submit">Filter</button>
+        <button class="btn">Filter</button>
     </form>
 
     <div class="grid">
-
         <div class="card" th:each="product : ${products}">
-            <h3 th:text="${product.name}">Productnaam</h3>
-            <span class="badge" th:text="${product.category.name}">Categorie</span>
-            <p th:text="${product.description}">Beschrijving</p>
-            <p><strong th:text="${product.dailyPrice}"></strong> €/dag</p>
-            <p>Voorraad: <span th:text="${product.stock}"></span></p>
+            <h3 th:text="${product.name}"></h3>
 
-            <a th:href="@{'/cart/add/' + ${product.id}}" class="btn">Toevoegen</a>
+            <span class="badge" th:text="${product.category.name}"></span>
+
+            <p class="info" th:text="${product.description}"></p>
+
+            <p class="price">
+                <span th:text="${product.dailyPrice}"></span> €/dag
+            </p>
+
+            <p class="info">Voorraad:
+                <span th:text="${product.stock}"></span>
+            </p>
+
+            <a th:href="@{'/cart/add/' + ${product.id}}"
+               class="btn"
+               onclick="showSnackbar()">
+                Toevoegen aan mandje
+            </a>
         </div>
-
     </div>
 
 </div>

@@ -8,130 +8,55 @@
     <title>Checkout - Rental Platform</title>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Arial;background:#f4f6f8;color:#111;}
+        a{text-decoration:none;color:inherit;}
+
+        nav{
+            background:#1c1c1c;color:white;padding:15px 26px;
+            display:flex;justify-content:space-between;align-items:center;
+            box-shadow:0 2px 8px rgba(0,0,0,0.35);
+        }
+        nav a{margin-right:18px;color:#d6d6d6;font-weight:500;transition:.2s;}
+        nav a:hover{color:#fff;}
+        nav form button{background:none;border:none;color:#ddd;font-size:15px;cursor:pointer;}
+        nav form button:hover{color:#fff;}
+
+        .container{width:95%;max-width:1100px;margin:35px auto;}
+        h1{margin-bottom:20px;}
+
+        .checkout-box{
+            background:white;padding:25px;border-radius:12px;
+            box-shadow:0 3px 10px rgba(0,0,0,0.12);
         }
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #111;
+        .summary-title{font-size:18px;font-weight:700;margin-bottom:15px;}
+
+        .summary-row{
+            display:flex;justify-content:space-between;
+            padding:10px 0;border-bottom:1px solid #ececec;
+        }
+        .summary-row:last-child{border-bottom:none;}
+
+        .total-row{
+            font-weight:700;font-size:17px;margin-top:10px;
+            padding-top:12px;border-top:2px solid #ddd;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
+        .btn{
+            padding:10px 16px;border-radius:7px;background:#1e88e5;
+            color:white;font-weight:600;font-size:15px;
+            cursor:pointer;border:none;transition:.2s;
         }
+        .btn:hover{background:#1565c0;}
 
-        nav {
-            background-color: #1e1e1e;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .btn-secondary{
+            background:#e0e0e0;color:#333;
         }
+        .btn-secondary:hover{background:#c5c5c5;}
 
-        nav a {
-            margin-right: 18px;
-            color: #ddd;
-            font-weight: 500;
-        }
-
-        nav a:hover,
-        nav form button:hover {
-            color: white;
-        }
-
-        nav form button {
-            background: transparent;
-            border: none;
-            color: #ddd;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .container {
-            width: 95%;
-            max-width: 900px;
-            margin: 30px auto;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        .checkout-box {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .summary-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .summary-row:last-child {
-            border-bottom: none;
-        }
-
-        .total-row {
-            font-weight: 700;
-            font-size: 17px;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 2px solid #ddd;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 16px;
-            border-radius: 6px;
-            background-color: #1e88e5;
-            color: white;
-            font-size: 15px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #1565c0;
-        }
-
-        .btn-secondary {
-            background-color: #e0e0e0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background-color: #c5c5c5;
-        }
-
-        .buttons {
-            margin-top: 25px;
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .buttons a,
-        .buttons button {
-            flex: 1;
-            text-align: center;
-        }
-
+        .buttons{display:flex;gap:12px;margin-top:25px;}
+        .buttons a,.buttons button{flex:1;text-align:center;}
     </style>
 </head>
 
@@ -141,33 +66,14 @@
     <div>
         <a href="/catalog">Catalogus</a>
 
-        <a href="/cart" style="position: relative; display: inline-block;">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 height="22"
-                 width="22"
-                 style="vertical-align: middle;">
-                <path fill="#ddd"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
-                         0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
-                         14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22 4.76 4 4.38
-                         4H2v2h1l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+        <a href="/cart" style="position:relative;display:inline-block;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                 height="22" width="22">
+                <path fill="#d6d6d6" d="M7 18c-1.1..."/>
             </svg>
-
-            <span th:if="${cartCount > 0}"
-                  th:text="${cartCount}"
-                  style="
-                      position: absolute;
-                      top: -6px;
-                      right: -10px;
-                      background-color: #43a047;
-                      color: white;
-                      padding: 2px 7px;
-                      font-size: 12px;
-                      border-radius: 50%;
-                      font-weight: bold;
-                  ">
+            <span th:if="${cartCount>0}" th:text="${cartCount}"
+                  style="position:absolute;top:-6px;right:-10px;background:#43a047;
+                  color:white;padding:3px 7px;font-size:11px;border-radius:50%;font-weight:700;">
             </span>
         </a>
 
@@ -176,19 +82,17 @@
 
     <div>
         <span sec:authorize="!isAuthenticated()">
-            <a href="/login">Inloggen</a>
-            <a href="/register">Registreren</a>
+            <a href="/login">Inloggen</a><a href="/register">Registreren</a>
         </span>
 
         <span sec:authorize="isAuthenticated()">
-            Ingelogd als: <strong sec:authentication="name"></strong> |
+            Ingelogd als <strong sec:authentication="name"></strong> |
             <form th:action="@{/logout}" method="post" style="display:inline;">
                 <button>Uitloggen</button>
             </form>
         </span>
     </div>
 </nav>
-
 
 <div class="container">
 
@@ -198,22 +102,19 @@
 
         <div class="summary-title">Overzicht</div>
 
-        <!-- ITEM OVERZICHT -->
-        <div th:each="item : ${items}" class="summary-row">
+        <div class="summary-row" th:each="item : ${items}">
             <span th:text="${item.product.name}"></span>
             <span>
-                <span th:text="'x ' + ${item.quantity}"></span> ·
-                <span th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'"></span>
+                x <span th:text="${item.quantity}"></span> •
+                <span th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity,1,'COMMA',2,'POINT')} + ' €'"></span>
             </span>
         </div>
 
-        <!-- TOTAAL -->
         <div class="summary-row total-row">
             <span>Totaal per dag:</span>
-            <span th:text="${#numbers.formatDecimal(total, 1,'COMMA',2,'POINT')} + ' €'"></span>
+            <span th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'"></span>
         </div>
 
-        <!-- KNOPPEN -->
         <div class="buttons">
             <a href="/cart" class="btn-secondary btn">Terug naar mandje</a>
 
@@ -221,9 +122,7 @@
                 <button class="btn">Bevestigen</button>
             </form>
         </div>
-
     </div>
-
 </div>
 
 </body>

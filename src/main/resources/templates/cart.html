@@ -7,166 +7,156 @@
     <meta charset="UTF-8">
     <title>Winkelmandje - Rental Platform</title>
 
+    <!-- ===== UNIFORM EMBEDDED CSS (zelfde styling als catalog.html) ===== -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #222;
+            background: #f4f6f8;
+            color: #111;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+        a { text-decoration: none; color: inherit; }
 
+        /* ===== NAVBAR ===== */
         nav {
-            background-color: #1e1e1e;
+            background: #1c1c1c;
             color: white;
-            padding: 15px 25px;
+            padding: 15px 26px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
         }
 
-        nav .left a,
-        nav .right a {
+        nav a {
             margin-right: 18px;
-            color: #ddd;
+            color: #d6d6d6;
             font-weight: 500;
+            transition: .2s ease;
         }
 
-        nav .right form button {
+        nav a:hover { color: #fff; }
+
+        nav form button {
             background: transparent;
             border: none;
-            color: #ddd;
+            color: #d6d6d6;
             cursor: pointer;
             font-size: 15px;
+            transition: .2s;
         }
+        nav form button:hover { color: #fff; }
 
-        nav .left a:hover,
-        nav .right a:hover,
-        nav .right form button:hover {
-            color: white;
-        }
-
+        /* ===== CONTAINER ===== */
         .container {
             width: 95%;
-            max-width: 900px;
-            margin: 30px auto;
+            max-width: 1100px;
+            margin: 35px auto;
         }
 
-        h1 {
+        h1 { margin-bottom: 20px; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-block;
+            padding: 9px 15px;
+            border-radius: 7px;
+            background: #1e88e5;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: .2s ease;
+        }
+
+        .btn:hover { background: #1565c0; }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .btn-secondary:hover { background: #c5c5c5; }
+
+        /* ===== EMPTY CART ===== */
+        .empty {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.10);
             margin-bottom: 20px;
         }
 
-        .empty {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 6px;
-            background-color: #1e88e5;
-            color: white;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #1565c0;
-        }
-
-        .btn-secondary {
-            background-color: #e0e0e0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background-color: #c5c5c5;
-        }
-
+        /* ===== TABLE ===== */
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
         }
 
         table th, table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #eee;
+            padding: 14px 16px;
+            border-bottom: 1px solid #ececec;
         }
 
         table th {
-            background-color: #f5f5f5;
+            background: #f5f5f5;
             text-align: left;
+            font-weight: 600;
         }
 
         table tr:last-child td {
             border-bottom: none;
         }
 
-        .text-right {
-            text-align: right;
-        }
+        .text-right { text-align: right; }
 
+        /* ===== TOTAL BOX ===== */
         .total-box {
-            margin-top: 15px;
+            margin-top: 18px;
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .total-label {
-            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.10);
             font-size: 16px;
         }
 
-        .total-amount {
-            font-weight: 700;
-            font-size: 18px;
-        }
+        .total-label { font-weight: 600; }
+        .total-amount { font-weight: 700; }
 
+        /* ===== ACTION BUTTONS ===== */
         .actions {
-            margin-top: 20px;
+            margin-top: 22px;
             display: flex;
-            justify-content: space-between;
             gap: 10px;
         }
 
         .actions a {
-            text-align: center;
             flex: 1;
+            text-align: center;
         }
     </style>
+
 </head>
 
 <body>
 
+<!-- ===== NAVBAR ===== -->
 <nav>
     <div class="left">
         <a href="/catalog">Catalogus</a>
 
         <a href="/cart" style="position: relative; display: inline-block;">
             <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 height="22"
-                 width="22"
-                 style="vertical-align: middle;">
-                <path fill="#ddd"
+                 viewBox="0 0 24 24" height="22" width="22">
+                <path fill="#d6d6d6"
                       d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
                          0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
                          14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
@@ -180,12 +170,12 @@
                       position: absolute;
                       top: -6px;
                       right: -10px;
-                      background-color: #43a047;
+                      background: #43a047;
                       color: white;
-                      padding: 2px 7px;
-                      font-size: 12px;
+                      padding: 3px 7px;
+                      font-size: 11px;
                       border-radius: 50%;
-                      font-weight: bold;
+                      font-weight: 700;
                   ">
             </span>
         </a>
@@ -208,6 +198,7 @@
     </div>
 </nav>
 
+<!-- ===== CONTENT ===== -->
 <div class="container">
 
     <h1>Winkelmandje</h1>
@@ -234,14 +225,15 @@
             <tr th:each="item : ${items}">
                 <td th:text="${item.product.name}"></td>
                 <td th:text="${item.quantity}"></td>
+
                 <td class="text-right"
-                    th:text="${#numbers.formatDecimal(item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
-                </td>
+                    th:text="${#numbers.formatDecimal(item.product.dailyPrice,1,'COMMA',2,'POINT')} + ' €'"></td>
+
                 <td class="text-right"
-                    th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'">
-                </td>
+                    th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity,1,'COMMA',2,'POINT')} + ' €'"></td>
+
                 <td class="text-right">
-                    <a th:href="@{'/cart/remove/' + ${item.product.id}}" class="btn-secondary btn">
+                    <a th:href="@{'/cart/remove/' + ${item.product.id}}" class="btn btn-secondary">
                         Verwijderen
                     </a>
                 </td>
@@ -251,7 +243,7 @@
         <div class="total-box">
             <span class="total-label">Totaal per dag:</span>
             <span class="total-amount"
-                  th:text="${#numbers.formatDecimal(total, 1,'COMMA',2,'POINT')} + ' €'"></span>
+                  th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'"></span>
         </div>
 
         <div class="actions">
