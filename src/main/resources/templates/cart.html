@@ -2,195 +2,144 @@
 <html lang="nl"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
+
     <title>Winkelmandje - Rental Platform</title>
 
-    <!-- ===== UNIFORM EMBEDDED CSS (zelfde styling als catalog.html) ===== -->
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Arial;background:#f4f6f8;color:#111;}
+        a{text-decoration:none;color:inherit;}
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f4f6f8;
-            color: #111;
+        nav{
+            background:#1c1c1c;color:white;padding:15px 26px;
+            display:flex;justify-content:space-between;align-items:center;
+            box-shadow:0 2px 8px rgba(0,0,0,0.35);
+            animation:fadeDown .4s ease;
+        }
+        @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+        nav a{margin-right:18px;color:#d6d6d6;font-weight:500;transition:.2s;}
+        nav a:hover{color:#fff;}
+
+        nav form button{background:none;border:none;color:#ddd;font-size:15px;cursor:pointer;transition:.2s;}
+        nav form button:hover{color:#fff;}
+
+        .container{
+            width:95%;max-width:1100px;margin:35px auto;
+            animation:fadeIn .4s ease-out;
+        }
+        @keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+        h1{margin-bottom:20px;}
+
+        table{
+            width:100%;border-collapse:collapse;background:white;
+            border-radius:12px;overflow:hidden;
+            box-shadow:0 3px 10px rgba(0,0,0,0.12);margin-bottom:20px;
+        }
+        table th,table td{
+            padding:14px 16px;border-bottom:1px solid #ececec;
+        }
+        table th{
+            background:#f5f5f5;font-weight:600;text-align:left;
+        }
+        table tr:last-child td{border-bottom:none;}
+        .text-right{text-align:right;}
+
+        .btn{
+            padding:10px 16px;border-radius:7px;background:#1e88e5;
+            color:white;font-weight:600;font-size:15px;cursor:pointer;
+            border:none;transition:.2s ease;display:inline-block;
+        }
+        .btn:hover{background:#1565c0;transform:translateY(-1px);}
+        .btn:active{transform:scale(0.97);}
+
+        .btn-secondary{background:#e0e0e0;color:#333;}
+        .btn-secondary:hover{background:#c5c5c5;}
+
+        .btn-remove{background:#e53935;}
+        .btn-remove:hover{background:#c62828;}
+
+        .empty{
+            background:white;padding:22px;border-radius:12px;
+            box-shadow:0 3px 10px rgba(0,0,0,0.12);
+            margin-bottom:20px;text-align:center;
+            animation:fadeUp .4s ease;
         }
 
-        a { text-decoration: none; color: inherit; }
-
-        /* ===== NAVBAR ===== */
-        nav {
-            background: #1c1c1c;
-            color: white;
-            padding: 15px 26px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px);}
+            to{opacity:1;transform:translateY(0);}
         }
 
-        nav a {
-            margin-right: 18px;
-            color: #d6d6d6;
-            font-weight: 500;
-            transition: .2s ease;
+        .total-box{
+            margin-top:18px;background:white;padding:18px;border-radius:12px;
+            display:flex;justify-content:space-between;
+            box-shadow:0 3px 10px rgba(0,0,0,0.10);font-size:16px;
+            animation:fadeIn .4s ease-out;
         }
+        .total-label{font-weight:600;}
+        .total-amount{font-weight:700;}
 
-        nav a:hover { color: #fff; }
+        .actions{margin-top:22px;display:flex;gap:10px;}
+        .actions a{flex:1;text-align:center;}
 
-        nav form button {
-            background: transparent;
-            border: none;
-            color: #d6d6d6;
-            cursor: pointer;
-            font-size: 15px;
-            transition: .2s;
+        #snackbar{
+            visibility:hidden;min-width:260px;background:#333;color:#fff;
+            text-align:center;border-radius:8px;
+            padding:12px;position:fixed;z-index:9999;
+            left:50%;bottom:30px;transform:translateX(-50%);
+            opacity:0;transition:opacity .4s,bottom .4s;
         }
-        nav form button:hover { color: #fff; }
-
-        /* ===== CONTAINER ===== */
-        .container {
-            width: 95%;
-            max-width: 1100px;
-            margin: 35px auto;
-        }
-
-        h1 { margin-bottom: 20px; }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-block;
-            padding: 9px 15px;
-            border-radius: 7px;
-            background: #1e88e5;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            border: none;
-            transition: .2s ease;
-        }
-
-        .btn:hover { background: #1565c0; }
-
-        .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
-        }
-        .btn-secondary:hover { background: #c5c5c5; }
-
-        /* ===== EMPTY CART ===== */
-        .empty {
-            background: white;
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.10);
-            margin-bottom: 20px;
-        }
-
-        /* ===== TABLE ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-        }
-
-        table th, table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #ececec;
-        }
-
-        table th {
-            background: #f5f5f5;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .text-right { text-align: right; }
-
-        /* ===== TOTAL BOX ===== */
-        .total-box {
-            margin-top: 18px;
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.10);
-            font-size: 16px;
-        }
-
-        .total-label { font-weight: 600; }
-        .total-amount { font-weight: 700; }
-
-        /* ===== ACTION BUTTONS ===== */
-        .actions {
-            margin-top: 22px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .actions a {
-            flex: 1;
-            text-align: center;
+        #snackbar.show{
+            visibility:visible;opacity:1;bottom:50px;
         }
     </style>
+
+    <script>
+        function showRemoveSnackbar() {
+            let bar = document.getElementById('snackbar');
+            bar.innerText = "Item verwijderd uit winkelmandje";
+            bar.classList.add('show');
+            setTimeout(() => bar.classList.remove('show'), 2500);
+        }
+    </script>
 
 </head>
 
 <body>
 
-<!-- ===== NAVBAR ===== -->
 <nav>
-    <div class="left">
+    <div>
         <a href="/catalog">Catalogus</a>
 
-        <a href="/cart" style="position: relative; display: inline-block;">
+        <a href="/cart" style="position:relative;display:inline-block;">
             <svg xmlns="http://www.w3.org/2000/svg"
                  viewBox="0 0 24 24" height="22" width="22">
-                <path fill="#d6d6d6"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10
-                         0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16
-                         14h9.53c.75 0 1.4-.41 1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22 4.76 4 4.38
-                         4H2v2h1l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+                <path fill="#d6d6d6" d="M7 18c-1.1 0-1.99..."/>
             </svg>
-
-            <span th:if="${cartCount > 0}"
-                  th:text="${cartCount}"
+            <span th:if="${cartCount>0}" th:text="${cartCount}"
                   style="
-                      position: absolute;
-                      top: -6px;
-                      right: -10px;
-                      background: #43a047;
-                      color: white;
-                      padding: 3px 7px;
-                      font-size: 11px;
-                      border-radius: 50%;
-                      font-weight: 700;
-                  ">
+                          position:absolute;top:-6px;right:-10px;
+                          background:#43a047;color:white;
+                          padding:3px 7px;font-size:11px;border-radius:50%;
+                          font-weight:700;">
             </span>
         </a>
 
         <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
     </div>
 
-    <div class="right">
+    <div>
         <span sec:authorize="!isAuthenticated()">
             <a href="/login">Inloggen</a>
             <a href="/register">Registreren</a>
         </span>
 
         <span sec:authorize="isAuthenticated()">
-            Ingelogd als: <strong sec:authentication="name"></strong> |
+            Ingelogd als <strong sec:authentication="name"></strong> |
             <form th:action="@{/logout}" method="post" style="display:inline;">
                 <button>Uitloggen</button>
             </form>
@@ -198,19 +147,17 @@
     </div>
 </nav>
 
-<!-- ===== CONTENT ===== -->
+<div id="snackbar"></div>
+
 <div class="container">
 
     <h1>Winkelmandje</h1>
 
-    <!-- Leeg mandje -->
     <div th:if="${#lists.isEmpty(items)}" class="empty">
-        <p>Je winkelmandje is momenteel leeg.</p>
-        <br>
+        <p>Je winkelmandje is momenteel leeg.</p><br>
         <a href="/catalog" class="btn">Terug naar catalogus</a>
     </div>
 
-    <!-- Gevuld mandje -->
     <div th:if="${!#lists.isEmpty(items)}">
 
         <table>
@@ -227,13 +174,17 @@
                 <td th:text="${item.quantity}"></td>
 
                 <td class="text-right"
-                    th:text="${#numbers.formatDecimal(item.product.dailyPrice,1,'COMMA',2,'POINT')} + ' €'"></td>
+                    th:text="${#numbers.formatDecimal(item.product.dailyPrice,1,'COMMA',2,'POINT')} + ' €'">
+                </td>
 
                 <td class="text-right"
-                    th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity,1,'COMMA',2,'POINT')} + ' €'"></td>
+                    th:text="${#numbers.formatDecimal(item.product.dailyPrice * item.quantity,1,'COMMA',2,'POINT')} + ' €'">
+                </td>
 
                 <td class="text-right">
-                    <a th:href="@{'/cart/remove/' + ${item.product.id}}" class="btn btn-secondary">
+                    <a th:href="@{'/cart/remove/' + ${item.product.id}}"
+                       class="btn btn-remove"
+                       onclick="showRemoveSnackbar()">
                         Verwijderen
                     </a>
                 </td>
