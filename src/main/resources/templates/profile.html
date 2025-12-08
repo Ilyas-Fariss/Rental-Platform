@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mijn Profiel - Rental Platform</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f8;
+            color: #111;
+        }
+
+        /* NAVBAR -------------------------------------------------------- */
+        nav {
+            background: #1c1c1c;
+            color: white;
+            padding: 15px 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+            animation: fadeDown .4s ease;
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        nav a {
+            margin-right: 18px;
+            color: #d6d6d6;
+            transition: .2s;
+            font-weight: 500;
+        }
+        nav a:hover { color: #fff; }
+
+        nav form button {
+            background: none;
+            border: none;
+            color: #d6d6d6;
+            cursor: pointer;
+            font-size: 15px;
+            transition: .2s;
+        }
+        nav form button:hover { color: #fff; }
+
+
+        /* PAGE CONTAINER ------------------------------------------------ */
+        .container {
+            width: 95%;
+            max-width: 950px;
+            margin: 40px auto;
+            animation: fadeIn .35s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+
+        /* PROFILE CARD -------------------------------------------------- */
+        .profile-card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            animation: fadeUp .45s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .avatar-wrapper {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            border: 3px solid #eee;
+            transition: .25s;
+        }
+
+        .avatar-wrapper:hover {
+            transform: scale(1.03);
+            border-color: #1e88e5;
+        }
+
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 4px;
+        }
+
+        .profile-info p {
+            color: #555;
+        }
+
+        /* TABS ----------------------------------------------------------- */
+        .tabs {
+            display: flex;
+            gap: 14px;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            transition: .25s;
+        }
+
+        .tab:hover { background: #f0f0f0; }
+
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid #1e88e5;
+            color: #1e88e5;
+        }
+
+        /* FORM ----------------------------------------------------------- */
+        .section {
+            display: none;
+            animation: fadeIn .35s ease-out;
+        }
+        .section.active { display: block; }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            background: white;
+            transition: .25s;
+        }
+
+        input:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 2px rgba(30,136,229,0.25);
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border-radius: 7px;
+            background: #1e88e5;
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: .25s ease;
+            font-size: 15px;
+        }
+        .btn:hover { background: #1565c0; transform: translateY(-2px); }
+        .btn:active { transform: scale(.97); }
+
+        .save-area {
+            margin-top: 20px;
+        }
+
+        /* AVATAR UPLOAD -------------------------------------------------- */
+        .upload-block {
+            border: 2px dashed #ccc;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: .25s;
+        }
+        .upload-block:hover {
+            border-color: #1e88e5;
+            background: #f0f7ff;
+        }
+
+        .upload-block input {
+            margin: 10px auto;
+        }
+
+    </style>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+            document.getElementById(tab).classList.add('active');
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+        }
+    </script>
+
+</head>
+
+<body>
+
+<nav>
+    <div>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
+        <a href="/profile" sec:authorize="isAuthenticated()">Profiel</a>
+    </div>
+
+    <div>
+        <span sec:authorize="isAuthenticated()">
+            Ingelogd als <strong sec:authentication="name"></strong> |
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button>Uitloggen</button>
+            </form>
+        </span>
+
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <div class="profile-header">
+            <div class="avatar-wrapper">
+                <img th:src="@{/uploads/profile/default.jpg}" alt="Profielfoto">
+            </div>
+
+            <div class="profile-info">
+                <h2 th:text="${username}">Gebruiker</h2>
+                <p th:text="${email}"></p>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" data-tab="profiel" onclick="switchTab('profiel')">Profiel</div>
+            <div class="tab" data-tab="account" onclick="switchTab('account')">Account</div>
+            <div class="tab" data-tab="security" onclick="switchTab('security')">Beveiliging</div>
+        </div>
+
+        <!-- TAB 1: PROFIEL -->
+        <div class="section active" id="profiel">
+
+            <form th:action="@{/profile/update}" method="post">
+
+                <label>Voornaam</label>
+                <input type="text" name="firstName" th:value="${firstName}">
+
+                <label>Achternaam</label>
+                <input type="text" name="lastName" th:value="${lastName}">
+
+                <label>Profielfoto</label>
+                <div class="upload-block">
+                    <p>Upload een nieuwe profielfoto</p>
+                    <input type="file" name="avatar">
+                </div>
+
+                <div class="save-area">
+                    <button class="btn">Wijzigingen opslaan</button>
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- TAB 2: ACCOUNT -->
+        <div class="section" id="account">
+
+            <form th:action="@{/profile/email}" method="post">
+
+                <label>Huidig e-mailadres</label>
+                <input type="email" th:value="${email}" disabled>
+
+                <label>Nieuw e-mailadres</label>
+                <input type="email" name="newEmail">
+
+                <div class="save-area">
+                    <button class="btn">E-mailadres wijzigen</button>
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- TAB 3: SECURITY -->
+        <div class="section" id="security">
+
+            <form th:action="@{/profile/password}" method="post">
+
+                <label>Huidig wachtwoord</label>
+                <input type="password" name="oldPassword">
+
+                <label>Nieuw wachtwoord</label>
+                <input type="password" name="newPassword">
+
+                <label>Herhaal nieuw wachtwoord</label>
+                <input type="password" name="confirmPassword">
+
+                <div class="save-area">
+                    <button class="btn">Wachtwoord wijzigen</button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
