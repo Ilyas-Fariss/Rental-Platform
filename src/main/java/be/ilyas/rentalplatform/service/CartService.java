@@ -89,7 +89,7 @@ public class CartService {
     }
 
     public void clearCart(HttpSession session) {
-        session.removeAttribute(CART_SESSION_KEY);
+        session.setAttribute("cart", new java.util.ArrayList<>());
     }
 
 }

@@ -27,58 +27,31 @@ public class RentalOrder {
     public RentalOrder() {}
 
     // GETTERS
+    public Long getId() { return id; }
 
-    public Long getId() {
-        return id;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public double getTotalPrice() { return totalPrice; }
 
-    public double getTotalPrice() {
-        return totalPrice;
-    }
+    public int getTotalItems() { return totalItems; }
 
-    public int getTotalItems() {
-        return totalItems;
-    }
+    public AppUser getUser() { return user; }
 
-    public AppUser getUser() {
-        return user;
-    }
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
+    public List<OrderItem> getItems() { return items; }
 
     // SETTERS
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public void setUser(AppUser user) { this.user = user; }
 
-    public void setUser(AppUser user) {
-        this.user = user;
-    }
-
-    /**
-     * Zorgt ervoor dat de OrderItem(s) automatisch terugwijzen naar deze order.
-     * Belangrijk: items is nooit null (wordt standaard geïnitialiseerd).
-     */
     public void setItems(List<OrderItem> items) {
-        this.items = (items != null) ? items : new ArrayList<>();
-
+        this.items = (items == null) ? new ArrayList<>() : items;
         for (OrderItem oi : this.items) {
             oi.setOrder(this);
         }
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
+    public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
 
-    public void setTotalItems(int totalItems) {
-        this.totalItems = totalItems;
-    }
+    public void setTotalItems(int totalItems) { this.totalItems = totalItems; }
 }
