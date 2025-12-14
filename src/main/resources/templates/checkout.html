@@ -5,216 +5,330 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Checkout - Rental Platform</title>
+    <title>Checkout – Rental Platform</title>
 
     <style>
-        /* BASE */
-        *{ margin:0; padding:0; box-sizing:border-box; }
-        body{
-            font-family:'Segoe UI',Arial,sans-serif;
-            background:#f4f6f8;
-            color:#111;
-        }
-        a{ text-decoration:none; color:inherit; }
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
 
-        /* NAVBAR */
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
+        }
+
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
         nav{
-            background:#1c1c1c;
+            background:var(--nav);
             color:white;
-            padding:15px 26px;
+            padding:14px 28px;
             display:flex;
             justify-content:space-between;
             align-items:center;
-            box-shadow:0 2px 8px rgba(0,0,0,0.35);
-            animation:fadeDown .4s ease;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
         }
-        @keyframes fadeDown{
-            from{ opacity:0; transform:translateY(-10px); }
-            to  { opacity:1; transform:translateY(0); }
-        }
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:600;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+        nav form{display:inline}
+        nav button{background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer}
+        nav button:hover{color:white}
 
-        nav a{
-            margin-right:18px;
-            color:#d6d6d6;
-            font-weight:500;
-            transition:.2s;
-        }
-        nav a:hover{ color:white; }
-
-        nav form button{
-            background:none;
-            border:none;
-            color:#d6d6d6;
-            cursor:pointer;
-            font-size:15px;
-            transition:.2s;
-        }
-        nav form button:hover{ color:white; }
-
-        /* LAYOUT */
-        .container{
-            width:95%;
-            max-width:1100px;
-            margin:35px auto;
-            animation:fadeIn .35s ease-out;
-        }
-        @keyframes fadeIn{
-            from{ opacity:0; transform:translateY(12px); }
-            to  { opacity:1; transform:translateY(0); }
-        }
-
-        h1{ margin-bottom:20px; }
-
-        /* CHECKOUT BOX */
-        .checkout-box{
-            background:white;
-            padding:25px;
+        .nav-cart{
+            position:relative;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
             border-radius:12px;
-            box-shadow:0 3px 10px rgba(0,0,0,0.12);
-            animation:fadeUp .4s ease;
-        }
-        @keyframes fadeUp{
-            from{ opacity:0; transform:translateY(12px); }
-            to  { opacity:1; transform:translateY(0); }
-        }
-
-        .summary-title{
-            font-size:18px;
-            font-weight:700;
-            margin-bottom:15px;
-        }
-
-        .summary-row{
-            display:flex;
-            justify-content:space-between;
-            padding:10px 0;
-            border-bottom:1px solid #ececec;
-        }
-        .summary-row:last-child{
-            border-bottom:none;
-        }
-
-        .total-row{
-            font-weight:700;
-            font-size:17px;
-            margin-top:10px;
-            padding-top:12px;
-            border-top:2px solid #ddd;
-        }
-
-        /* BUTTONS */
-        .btn{
-            padding:10px 16px;
-            border-radius:7px;
-            background:#1e88e5;
-            color:white;
-            font-weight:600;
-            font-size:15px;
-            cursor:pointer;
-            border:none;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
             transition:.2s;
-            display:inline-block;
-            text-align:center;
         }
-        .btn:hover{
-            background:#1565c0;
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
             transform:translateY(-1px);
         }
-        .btn:active{
-            transform:scale(0.97);
+        .nav-cart svg{width:18px;height:18px;fill:white}
+        .cart-badge{
+            position:absolute;top:-6px;right:-8px;
+            background:var(--success);color:white;
+            font-size:11px;padding:2px 7px;border-radius:999px;
+            font-weight:800;border:2px solid var(--nav);
         }
+
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1050px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
+        }
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
+        }
+
+        h1{
+            margin:0;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:-.02em;
+        }
+        .subtitle{color:var(--text-muted);margin-top:6px;line-height:1.5}
+
+        .pill{
+            display:inline-block;
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:.04em;
+            padding:6px 10px;
+            border-radius:999px;
+            background:#EEF2FF;
+            border:1px solid #E0E7FF;
+            color:var(--primary-dark);
+        }
+
+        /* ========== CARD ========== */
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:22px;
+            box-shadow:0 14px 40px rgba(15,23,42,.10);
+            overflow:hidden;
+        }
+        .card-head{
+            padding:16px 18px;
+            border-bottom:1px solid #EEF2F7;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .card-head strong{font-size:14px}
+        .card-body{padding:16px 18px}
+
+        /* ========== ROWS ========== */
+        .row{
+            display:flex;
+            justify-content:space-between;
+            gap:14px;
+            padding:14px 0;
+            border-bottom:1px solid #EEF2F7;
+        }
+        .row:last-child{border-bottom:none}
+
+        .left .name{
+            font-weight:900;
+            font-size:15px;
+        }
+        .left .meta{
+            margin-top:6px;
+            color:var(--text-muted);
+            font-size:12px;
+            line-height:1.45;
+        }
+        .price{
+            font-weight:900;
+            white-space:nowrap;
+        }
+
+        /* ========== TOTAL ========== */
+        .totalbox{
+            margin-top:14px;
+            padding:16px;
+            border-radius:18px;
+            background:rgba(99,102,241,.08);
+            border:1px solid rgba(99,102,241,.18);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .totalbox .label{
+            color:var(--text-muted);
+            font-weight:900;
+            letter-spacing:.03em;
+        }
+        .totalbox .big{
+            font-size:22px;
+            font-weight:900;
+        }
+
+        /* ========== BUTTONS ========== */
+        .actions{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-top:14px;
+        }
+        @media(max-width:760px){.actions{grid-template-columns:1fr}}
+
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:12px 14px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
+        }
+
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
+        }
+        .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
 
         .btn-secondary{
-            background:#e0e0e0;
-            color:#333;
+            background:#E5E7EB;
+            color:#111827;
         }
-        .btn-secondary:hover{
-            background:#c5c5c5;
-        }
+        .btn-secondary:hover{background:#D1D5DB}
 
-        .buttons{
-            display:flex;
-            gap:12px;
-            margin-top:25px;
+        /* ========== INFO STRIP ========== */
+        .info{
+            margin-top:14px;
+            padding:14px 16px;
+            border-radius:18px;
+            background:rgba(15,23,42,.04);
+            border:1px solid rgba(15,23,42,.08);
+            color:#334155;
+            line-height:1.5;
+            font-size:13px;
         }
-        .buttons a,
-        .buttons button{
-            flex:1;
-        }
+        .info strong{color:#0f172a}
     </style>
-
 </head>
 
 <body>
 
 <nav>
-    <div>
-        <a href="/catalog">Catalogus</a>
-
-        <a href="/cart" style="position:relative;display:inline-block;">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24" height="22" width="22">
-                <path fill="#d6d6d6"
-                      d="M7 18c-1.1..."/>
+    <div class="nav-left">
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
             </svg>
-
-            <span th:if="${cartCount>0}" th:text="${cartCount}"
-                  style="
-                      position:absolute;top:-6px;right:-10px;
-                      background:#43a047;color:white;
-                      padding:3px 7px;font-size:11px;border-radius:50%;
-                      font-weight:700;">
-            </span>
+            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
         </a>
 
-        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders">Mijn reservaties</a>
     </div>
 
-    <div>
+    <div class="nav-right">
         <span sec:authorize="!isAuthenticated()">
             <a href="/login">Inloggen</a>
             <a href="/register">Registreren</a>
         </span>
-
         <span sec:authorize="isAuthenticated()">
-            Ingelogd als <strong sec:authentication="name"></strong> |
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button>Uitloggen</button>
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
             </form>
         </span>
     </div>
 </nav>
 
-<div class="container">
+<div class="page">
 
-    <h1>Checkout</h1>
+    <div class="topbar">
+        <div>
+            <h1>Checkout</h1>
+            <div class="subtitle">
+                Controleer je items en einddatums. Daarna kan je je reservatie bevestigen.
+            </div>
+        </div>
+        <span class="pill" th:text="${#lists.size(items)} + ' item(s)'">0 item(s)</span>
+    </div>
 
-    <div class="checkout-box">
-
-        <div class="summary-title">Overzicht</div>
-
-        <div class="summary-row" th:each="item : ${items}">
-            <span th:text="${item.product.name}"></span>
-            <span>
-                x <span th:text="${item.quantity}"></span> •
-                <span th:text="${#numbers.formatDecimal(
-                    item.product.dailyPrice * item.quantity, 1,'COMMA',2,'POINT')} + ' €'"></span>
-            </span>
+    <div class="card">
+        <div class="card-head">
+            <strong>Overzicht</strong>
+            <span class="pill">prijs/dag × aantal × dagen</span>
         </div>
 
-        <div class="summary-row total-row">
-            <span>Totaal per dag:</span>
-            <span th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'"></span>
+        <div class="card-body">
+
+            <div class="row" th:each="item : ${items}">
+                <div class="left">
+                    <div class="name" th:text="${item.product.name}">Product</div>
+                    <div class="meta">
+                        Aantal: <strong th:text="${item.quantity}">1</strong>
+                        • Lenen tot: <strong th:text="${item.endDate}">2025-12-18</strong>
+                        • Dagen: <strong th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1}">1</strong>
+                    </div>
+                </div>
+
+                <div class="price"
+                     th:text="${#numbers.formatDecimal(
+                        item.product.dailyPrice * item.quantity *
+                        (T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1),
+                        1,'COMMA',2,'POINT')} + ' €'">
+                    0,00 €
+                </div>
+            </div>
+
+            <div class="totalbox">
+                <div>
+                    <div class="label">Totaal te betalen</div>
+                    <div class="info" style="margin:10px 0 0">
+                        Als je een einddatum wil aanpassen, ga terug naar je mandje.
+                    </div>
+                </div>
+                <div class="big" th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'">0,00 €</div>
+            </div>
+
+            <div class="actions">
+                <a href="/cart" class="btn btn-secondary">Terug naar mandje</a>
+
+                <form th:action="@{/orders/confirm}" method="get" style="margin:0">
+                    <button class="btn btn-primary" type="submit">Reservatie bevestigen</button>
+                </form>
+            </div>
+
         </div>
+    </div>
 
-        <div class="buttons">
-            <a href="/cart" class="btn-secondary btn">Terug naar mandje</a>
-
-            <form th:action="@{/orders/confirm}" method="get">
-                <button class="btn">Bevestigen</button>
-            </form>
-        </div>
-
+    <div class="info">
+        <strong>Bevestiging:</strong> na bevestigen wordt je reservatie opgeslagen en zichtbaar onder “Mijn reservaties”.
     </div>
 
 </div>

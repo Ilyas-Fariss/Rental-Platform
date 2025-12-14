@@ -5,283 +5,363 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Catalogus - Rental Platform</title>
+    <title>Catalogus – Rental Platform</title>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f4f6f8;
-            color: #111;
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
         }
 
-        a { text-decoration: none; color: inherit; }
-
-        /* NAVBAR */
-        nav {
-            background: #1c1c1c;
-            color: white;
-            padding: 15px 26px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
         }
 
-        nav a {
-            margin-right: 18px;
-            color: #d6d6d6;
-            font-weight: 500;
-            transition: .2s ease;
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
+        nav{
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
         }
 
-        nav a:hover { color: #fff; }
-
-        nav form button {
-            background: transparent;
-            border: none;
-            color: #d6d6d6;
-            cursor: pointer;
-            font-size: 15px;
-            transition: .2s;
+        .nav-left,.nav-right{
+            display:flex;
+            align-items:center;
+            gap:18px;
         }
 
-        nav form button:hover { color: #fff; }
-
-        /* CONTAINER */
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            margin: 35px auto;
-            animation: fadeIn .4s ease-out;
+        nav a{
+            color:#E5E7EB;
+            font-weight:600;
+            font-size:14px;
+            transition:.2s;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
+        nav a:hover{
+            color:white;
+            transform:translateY(-1px);
         }
 
-        h1 { margin-bottom: 20px; font-weight: 700; }
-
-        /* FILTERBAR */
-        .filters {
-            background: white;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-            margin-bottom: 26px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            animation: slideDown .4s ease;
+        .nav-cart{
+            position:relative;
+            width:36px;
+            height:36px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
+            transition:.2s;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
         }
 
-        .filters label { font-weight: 600; }
-
-        .filters select,
-        .filters input {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 14px;
+        .nav-cart svg{
+            width:18px;
+            height:18px;
+            fill:white;
         }
 
-        .filters select:focus,
-        .filters input:focus {
-            border-color: #1e88e5;
-            box-shadow: 0 0 0 2px rgba(30,136,229,0.25);
-            outline: none;
+        .cart-badge{
+            position:absolute;
+            top:-6px;
+            right:-8px;
+            background:var(--success);
+            color:white;
+            font-size:11px;
+            padding:2px 7px;
+            border-radius:999px;
+            font-weight:800;
+            border:2px solid var(--nav);
         }
 
-        .btn {
-            padding: 9px 15px;
-            border-radius: 7px;
-            background: #1e88e5;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: .2s ease;
+        nav form{display:inline}
+        nav button{
+            background:none;
+            border:none;
+            color:#E5E7EB;
+            font-weight:600;
+            cursor:pointer;
+        }
+        nav button:hover{color:white}
+
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1300px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
         }
 
-        .btn:hover {
-            background: #1565c0;
-            transform: translateY(-1px);
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
         }
 
-        /* PRODUCTGRID */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 22px;
+        h1{
+            font-size:30px;
+            font-weight:800;
+            margin:0 0 6px;
         }
 
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-            transition: .25s ease;
-            opacity: 0;
-            animation: fadeUp .5s forwards;
+        .subtitle{
+            color:var(--text-muted);
+            margin-bottom:22px;
         }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
+        /* ========== FILTERS ========== */
+        .filters{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:18px;
+            padding:18px;
+            display:flex;
+            flex-wrap:wrap;
+            gap:14px;
+            align-items:end;
+            box-shadow:0 12px 35px rgba(15,23,42,.08);
+            margin-bottom:24px;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+        .filter-group{
+            display:flex;
+            flex-direction:column;
+            gap:6px;
         }
 
-        .badge {
-            background: #e7e7e7;
-            padding: 5px 9px;
-            border-radius: 6px;
-            font-size: 12px;
-            display: inline-block;
-            margin-bottom: 10px;
+        label{
+            font-size:12px;
+            font-weight:800;
+            color:var(--text-muted);
+            letter-spacing:.05em;
+            text-transform:uppercase;
         }
 
-        .price {
-            font-weight: 700;
-            margin: 10px 0;
-            font-size: 16px;
+        input,select{
+            padding:11px 14px;
+            border-radius:12px;
+            border:1px solid #D1D5DB;
+            background:#F9FAFB;
+            font-size:14px;
         }
 
-        .info {
-            font-size: 14px;
-            margin-bottom: 10px;
+        input:focus,select:focus{
+            outline:none;
+            border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(99,102,241,.25);
+            background:white;
         }
 
-        /* SNACKBAR */
-        #snackbar {
-            visibility: hidden;
-            background-color: #323232;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            position: fixed;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity .4s, bottom .4s;
-            min-width: 260px;
-            text-align: center;
-            z-index: 9999;
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
+            border:none;
+            border-radius:14px;
+            padding:12px 18px;
+            font-weight:800;
+            cursor:pointer;
+            transition:.2s;
         }
 
-        #snackbar.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 50px;
+        .btn-primary:hover{
+            transform:translateY(-1px);
+            filter:brightness(1.05);
+        }
+
+        /* ========== GRID ========== */
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+            gap:22px;
+        }
+
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:20px;
+            padding:20px;
+            box-shadow:0 14px 40px rgba(15,23,42,.1);
+            transition:.25s;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+        }
+
+        .card:hover{
+            transform:translateY(-4px);
+            box-shadow:0 22px 55px rgba(15,23,42,.18);
+        }
+
+        .card h3{
+            margin:0 0 4px;
+            font-size:18px;
+            font-weight:800;
+        }
+
+        .category{
+            display:inline-block;
+            font-size:11px;
+            font-weight:800;
+            padding:4px 10px;
+            border-radius:999px;
+            background:#EEF2FF;
+            color:var(--primary-dark);
+            margin-bottom:10px;
+        }
+
+        .desc{
+            color:#334155;
+            font-size:14px;
+            margin-bottom:14px;
+        }
+
+        .price{
+            font-size:18px;
+            font-weight:900;
+            margin-bottom:4px;
+        }
+
+        .stock{
+            color:var(--text-muted);
+            font-size:13px;
+            margin-bottom:14px;
+        }
+
+        .add{
+            background:var(--nav);
+            color:white;
+            text-align:center;
+            padding:12px;
+            border-radius:14px;
+            font-weight:800;
+            transition:.2s;
+        }
+
+        .add:hover{
+            background:var(--primary);
+            transform:translateY(-1px);
+        }
+
+        .empty{
+            background:var(--surface);
+            border:1px dashed var(--border);
+            padding:28px;
+            border-radius:18px;
+            text-align:center;
+            color:var(--text-muted);
         }
     </style>
-
-    <script>
-        function showSnackbar() {
-            let bar = document.getElementById('snackbar');
-            bar.classList.add('show');
-            setTimeout(() => bar.classList.remove('show'), 2500);
-        }
-    </script>
 </head>
 
 <body>
 
 <nav>
-    <div>
-        <a href="/catalog">Catalogus</a>
-
-        <a href="/cart" style="position:relative;display:inline-block;">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 height="22" width="22" viewBox="0 0 24 24">
-                <path fill="#d6d6d6" d="M7 18c-1.1 0-1.99..."/>
+    <div class="nav-left">
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart">
+            <svg viewBox="0 0 24 24">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
             </svg>
-            <span th:if="${cartCount>0}" th:text="${cartCount}"
-                  style="
-                      position:absolute;
-                      top:-6px;right:-10px;
-                      background:#43a047;
-                      color:white;
-                      padding:3px 7px;
-                      font-size:11px;
-                      border-radius:50%;
-                      font-weight:700;">
-            </span>
+            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
         </a>
 
-        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders">Mijn reservaties</a>
     </div>
 
-    <div>
+    <div class="nav-right">
         <span sec:authorize="!isAuthenticated()">
             <a href="/login">Inloggen</a>
             <a href="/register">Registreren</a>
         </span>
-
         <span sec:authorize="isAuthenticated()">
-            Ingelogd als <strong sec:authentication="name"></strong> |
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button style="background:none;border:none;color:#d6d6d6;">Uitloggen</button>
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button>Uitloggen</button>
             </form>
         </span>
     </div>
 </nav>
 
-<div id="snackbar">Toegevoegd aan winkelmandje!</div>
-
-<div class="container">
-
+<div class="page">
     <h1>Catalogus</h1>
+    <div class="subtitle">
+        Kies materiaal en voeg het toe aan je mandje. De huurperiode bepaal je later.
+    </div>
 
-    <form class="filters" method="get" th:action="@{/catalog}">
-        <label>Categorie:</label>
-        <select name="categoryId">
-            <option value="">Alle categorieën</option>
-            <option th:each="cat : ${categories}"
-                    th:value="${cat.id}"
-                    th:text="${cat.name}"></option>
-        </select>
+    <form class="filters" method="get" action="/catalog">
+        <div class="filter-group">
+            <label>Categorie</label>
+            <select name="categoryId">
+                <option value="">Alle categorieën</option>
+                <option th:each="c : ${categories}"
+                        th:value="${c.id}"
+                        th:text="${c.name}"
+                        th:selected="${categoryId != null and c.id == categoryId}">
+                </option>
+            </select>
+        </div>
 
-        <label>Zoek:</label>
-        <input type="text" name="search" th:value="${search}" placeholder="Zoek product...">
+        <div class="filter-group">
+            <label>Zoeken</label>
+            <input type="text" name="search" placeholder="Zoek product…" th:value="${search}">
+        </div>
 
-        <button class="btn">Filter</button>
+        <button class="btn-primary" type="submit">Filter</button>
     </form>
+
+    <div class="empty" th:if="${#lists.isEmpty(products)}">
+        Geen producten gevonden voor deze filters.
+    </div>
 
     <div class="grid">
         <div class="card" th:each="product : ${products}">
-            <h3 th:text="${product.name}"></h3>
+            <div>
+                <span class="category" th:text="${product.category.name}">Categorie</span>
+                <h3 th:text="${product.name}">Product</h3>
+                <div class="desc" th:text="${product.description}">Beschrijving</div>
+            </div>
 
-            <span class="badge" th:text="${product.category.name}"></span>
-
-            <p class="info" th:text="${product.description}"></p>
-
-            <p class="price">
-                <span th:text="${product.dailyPrice}"></span> €/dag
-            </p>
-
-            <p class="info">Voorraad: <span th:text="${product.stock}"></span></p>
-
-            <a th:href="@{'/cart/add/' + ${product.id}}"
-               class="btn"
-               onclick="showSnackbar()">
-                Toevoegen aan mandje
-            </a>
+            <div>
+                <div class="price" th:text="${product.dailyPrice} + ' €/dag'">0 €/dag</div>
+                <div class="stock">Voorraad: <strong th:text="${product.stock}">0</strong></div>
+                <a class="add" th:href="@{'/cart/add/' + ${product.id}}">
+                    Toevoegen aan mandje
+                </a>
+            </div>
         </div>
     </div>
-
 </div>
 
 </body>

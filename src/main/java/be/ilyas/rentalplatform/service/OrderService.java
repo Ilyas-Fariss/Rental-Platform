@@ -3,13 +3,15 @@ package be.ilyas.rentalplatform.service;
 import be.ilyas.rentalplatform.model.AppUser;
 import be.ilyas.rentalplatform.model.CartItem;
 import be.ilyas.rentalplatform.model.OrderItem;
+import be.ilyas.rentalplatform.model.Product;
 import be.ilyas.rentalplatform.model.RentalOrder;
 import be.ilyas.rentalplatform.repository.RentalOrderRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -24,64 +26,67 @@ public class OrderService {
         this.cartService = cartService;
     }
 
-    /**
-     * Maakt een nieuwe order op basis van het winkelmandje in de sessie.
-     * Leegt daarna het mandje.
-     */
     public RentalOrder createOrderFromCart(AppUser user, HttpSession session) {
 
         List<CartItem> cartItems = cartService.getAllItems(session);
 
         if (cartItems == null || cartItems.isEmpty()) {
-            return null; // niets te bestellen
+            return null;
         }
 
         RentalOrder order = new RentalOrder();
         order.setUser(user);
         order.setCreatedAt(LocalDateTime.now());
 
-        List<OrderItem> orderItems = new ArrayList<>();
+        double total = 0;
         int totalItems = 0;
-        double totalPrice = 0.0;
+
+        LocalDate today = LocalDate.now();
 
         for (CartItem cartItem : cartItems) {
-            OrderItem orderItem = new OrderItem(
-                    order,
-                    cartItem.getProduct(),
-                    cartItem.getQuantity(),
-                    cartItem.getProduct().getDailyPrice()
-            );
-            orderItems.add(orderItem);
 
-            totalItems += cartItem.getQuantity();
-            totalPrice += cartItem.getQuantity() * cartItem.getProduct().getDailyPrice();
+            Product product = cartItem.getProduct();
+            int quantity = cartItem.getQuantity();
+
+            OrderItem oi = new OrderItem();
+            oi.setOrder(order);
+            oi.setProduct(product);
+            oi.setQuantity(quantity);
+
+            // als je endDate in CartItem hebt:
+            oi.setEndDate(cartItem.getEndDate());
+
+            // voeg toe aan order (BELANGRIJK: order.getItems() mag niet null zijn)
+            order.getItems().add(oi);
+
+            // prijs: dailyPrice * quantity * days
+            if (product != null && cartItem.getEndDate() != null) {
+                long days = ChronoUnit.DAYS.between(today, cartItem.getEndDate()) + 1;
+                if (days < 1) days = 1;
+                total += product.getDailyPrice() * quantity * days;
+            } else if (product != null) {
+                // fallback: als geen datum gekozen werd, reken 1 dag
+                total += product.getDailyPrice() * quantity;
+            }
+
+            totalItems += quantity;
         }
 
-        order.setItems(orderItems);
         order.setTotalItems(totalItems);
-        order.setTotalPrice(totalPrice);
+        order.setTotalPrice(total);
 
-        RentalOrder savedOrder = rentalOrderRepository.save(order);
+        RentalOrder saved = rentalOrderRepository.save(order);
 
-        // mandje leegmaken
         cartService.clearCart(session);
 
-        return savedOrder;
+        return saved;
     }
 
-    /**
-     * Haal alle orders van een gebruiker op.
-     */
     public List<RentalOrder> getOrdersForUser(AppUser user) {
         return rentalOrderRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
-    /**
-     * Haal één specifieke order op voor deze gebruiker.
-     */
     public RentalOrder getOrderForUser(Long orderId, AppUser user) {
-        return rentalOrderRepository.findById(orderId)
-                .filter(o -> o.getUser().getId().equals(user.getId()))
-                .orElse(null);
+        return rentalOrderRepository.findByIdAndUser(orderId, user).orElse(null);
     }
 }

@@ -1,128 +1,392 @@
 <!DOCTYPE html>
 <html lang="nl"
-      xmlns:th="http://www.thymeleaf.org">
-
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Reservatie detail - Rental Platform</title>
+    <title>Reservatie details – Rental Platform</title>
 
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',Arial;background:#f4f6f8;color:#111;}
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
 
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
+        }
+
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
         nav{
-            background:#1c1c1c;padding:15px 26px;color:white;
-            display:flex;justify-content:space-between;align-items:center;
-            box-shadow:0 2px 8px rgba(0,0,0,0.35);
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
         }
-        nav a{margin-right:18px;color:#d6d6d6;font-weight:500;}
-        nav a:hover{color:white;}
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:600;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+        nav form{display:inline}
+        nav button{background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer}
+        nav button:hover{color:white}
 
-        .container{width:95%;max-width:1100px;margin:35px auto;}
-        h1{margin-bottom:6px;}
-        .subtitle{margin-bottom:20px;color:#666;}
-
-        .card{
-            background:white;padding:22px;border-radius:12px;
-            box-shadow:0 3px 10px rgba(0,0,0,0.12);
+        .nav-cart{
+            position:relative;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
+            transition:.2s;
+        }
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
+        }
+        .nav-cart svg{width:18px;height:18px;fill:white}
+        .cart-badge{
+            position:absolute;top:-6px;right:-8px;
+            background:var(--success);color:white;
+            font-size:11px;padding:2px 7px;border-radius:999px;
+            font-weight:800;border:2px solid var(--nav);
         }
 
-        .info-row{display:flex;justify-content:space-between;margin-bottom:8px;}
-        .info-label{font-weight:600;}
-
-        table{
-            width:100%;margin-top:18px;border-collapse:collapse;
-            background:white;border-radius:12px;overflow:hidden;
-            box-shadow:0 3px 10px rgba(0,0,0,0.12);
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1200px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
         }
-        th,td{padding:14px 16px;border-bottom:1px solid #ececec;}
-        th{background:#f5f5f5;font-weight:600;}
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
+        }
 
-        .text-right{text-align:right;}
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
+        }
 
-        .actions{display:flex;gap:12px;margin-top:18px;}
-        .actions a{text-align:center;flex:1;}
+        h1{
+            margin:0;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:-.02em;
+        }
+        .subtitle{color:var(--text-muted);margin-top:6px;line-height:1.5}
 
-        .btn{
-            padding:10px 14px;border-radius:7px;background:#1e88e5;
-            color:white;font-size:14px;font-weight:600;border:none;
-            cursor:pointer;transition:.2s;
+        .pill{
             display:inline-block;
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:.04em;
+            padding:6px 10px;
+            border-radius:999px;
+            background:#EEF2FF;
+            border:1px solid #E0E7FF;
+            color:var(--primary-dark);
         }
-        .btn:hover{background:#1565c0;}
+        .status{
+            display:inline-block;
+            font-size:11px;
+            font-weight:900;
+            padding:6px 10px;
+            border-radius:999px;
+            background:rgba(34,197,94,.12);
+            border:1px solid rgba(34,197,94,.22);
+            color:#15803D;
+        }
+        .idtag{
+            display:inline-block;
+            font-size:12px;
+            font-weight:900;
+            padding:6px 10px;
+            border-radius:999px;
+            background:#F1F5F9;
+            border:1px solid #E2E8F0;
+            color:#0f172a;
+        }
 
-        .btn-secondary{
-            background:#e0e0e0;color:#333;
+        /* ========== LAYOUT ========== */
+        .grid{
+            display:grid;
+            grid-template-columns:2.1fr 1fr;
+            gap:18px;
+            align-items:start;
         }
-        .btn-secondary:hover{background:#c5c5c5;}
+        @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+
+        /* ========== CARDS ========== */
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:22px;
+            box-shadow:0 14px 40px rgba(15,23,42,.10);
+            overflow:hidden;
+        }
+        .card-head{
+            padding:16px 18px;
+            border-bottom:1px solid #EEF2F7;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .card-head strong{font-size:14px}
+        .card-body{padding:16px 18px}
+
+        /* ========== TABLE ========== */
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:12px 10px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+        th{
+            text-align:left;
+            font-size:12px;
+            font-weight:900;
+            color:var(--text-muted);
+            letter-spacing:.05em;
+            text-transform:uppercase;
+        }
+        tr:last-child td{border-bottom:none}
+
+        .prod{font-weight:900}
+        .muted{color:var(--text-muted);font-size:12px;margin-top:4px;line-height:1.45}
+        .price{font-weight:900;white-space:nowrap}
+
+        /* ========== SUMMARY ========== */
+        .sumrow{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:12px 0;
+            border-bottom:1px solid #EEF2F7;
+        }
+        .sumrow:last-child{border-bottom:none}
+        .sumrow .label{color:var(--text-muted);font-weight:900}
+        .sumrow .value{font-weight:900}
+
+        .totalbox{
+            margin-top:10px;
+            padding:14px;
+            border-radius:18px;
+            background:rgba(99,102,241,.08);
+            border:1px solid rgba(99,102,241,.18);
+        }
+        .totalbox .big{
+            font-size:22px;
+            font-weight:900;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            padding:11px 14px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
+        }
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
+        }
+        .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
+        .btn-secondary{
+            background:#E5E7EB;
+            color:#111827;
+        }
+        .btn-secondary:hover{background:#D1D5DB}
+
+        .note{
+            margin-top:14px;
+            padding:14px 16px;
+            border-radius:18px;
+            background:rgba(15,23,42,.04);
+            border:1px solid rgba(15,23,42,.08);
+            color:#334155;
+            line-height:1.5;
+            font-size:13px;
+        }
+        .note strong{color:#0f172a}
+
+        .empty{
+            padding:18px;
+            border-radius:18px;
+            background:rgba(15,23,42,.04);
+            border:1px solid rgba(15,23,42,.08);
+            color:#334155;
+            line-height:1.5;
+            font-size:13px;
+        }
     </style>
 </head>
 
 <body>
 
 <nav>
-    <div>
+    <div class="nav-left">
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
+            </svg>
+            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
+        </a>
+
+        <a href="/dashboard">Dashboard</a>
         <a href="/catalog">Catalogus</a>
-        <a href="/cart">Winkelmandje</a>
         <a href="/orders">Mijn reservaties</a>
     </div>
-    <div>
-        <a href="/login">Inloggen</a>
-        <a href="/register">Registreren</a>
+
+    <div class="nav-right">
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
+        <span sec:authorize="isAuthenticated()">
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
+            </form>
+        </span>
     </div>
 </nav>
 
-<div class="container">
+<div class="page">
 
-    <h1>Reservatie bevestigd</h1>
-    <p class="subtitle">Hier is het overzicht van je reservatie.</p>
-
-    <div class="card">
-
-        <div class="info-row">
-            <span class="info-label">Ordernummer:</span>
-            <span th:text="${order.id}"></span>
+    <div class="topbar">
+        <div>
+            <h1>Reservatie details</h1>
+            <div class="subtitle">
+                Bekijk de items en hun einddatum. Dit is een bevestigde reservatie.
+            </div>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">Datum:</span>
-            <span th:text="${order.createdAt}"></span>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span class="idtag" th:text="'#' + ${order.id}">#1</span>
+            <span class="status" th:text="${order.status != null ? order.status : 'Bevestigd'}">Bevestigd</span>
+            <a href="/orders" class="btn btn-secondary">Terug</a>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <!-- ITEMS -->
+        <div class="card">
+            <div class="card-head">
+                <strong>Items</strong>
+                <span class="pill">Overzicht</span>
+            </div>
+
+            <div class="card-body">
+
+                <!-- VEILIG: als items leeg/null zijn -->
+                <div class="empty" th:if="${order.items == null or #lists.isEmpty(order.items)}">
+                    Er zijn geen items gevonden voor deze reservatie.
+                </div>
+
+                <table th:if="${order.items != null and !#lists.isEmpty(order.items)}">
+                    <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Aantal</th>
+                        <th>Lenen tot</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="it : ${order.items}">
+                        <td>
+                            <div class="prod" th:text="${it.product.name}">Product</div>
+
+                            <!-- Veilig: alleen tonen als dailyPrice bestaat -->
+                            <div class="muted" th:if="${it.product != null}">
+                                Prijs/dag:
+                                <strong th:text="${#numbers.formatDecimal(it.product.dailyPrice,1,'COMMA',2,'POINT')} + ' €'">0,00 €</strong>
+                            </div>
+                        </td>
+
+                        <td th:text="${it.quantity}">1</td>
+                        <td th:text="${it.endDate}">2025-12-18</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">Aantal items:</span>
-            <span th:text="${order.totalItems}"></span>
+        <!-- SUMMARY -->
+        <div class="card">
+            <div class="card-head">
+                <strong>Samenvatting</strong>
+                <span class="pill">Totaal</span>
+            </div>
+
+            <div class="card-body">
+                <div class="sumrow">
+                    <span class="label">Status</span>
+                    <span class="value" th:text="${order.status != null ? order.status : 'Bevestigd'}">Bevestigd</span>
+                </div>
+
+                <div class="sumrow">
+                    <span class="label">Items</span>
+                    <span class="value" th:text="${order.totalItems}">0</span>
+                </div>
+
+                <div class="sumrow">
+                    <span class="label">Totaal</span>
+                    <span class="value price"
+                          th:text="${#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT')} + ' €'">0,00 €</span>
+                </div>
+
+                <div class="totalbox">
+                    <div class="label" style="font-weight:900;color:var(--text-muted)">Te betalen</div>
+                    <div class="big price"
+                         th:text="${#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT')} + ' €'">0,00 €</div>
+                    <div class="muted" style="margin-top:6px">
+                        De prijs is berekend op basis van de gekozen einddatums.
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">Totaal per dag:</span>
-            <span th:text="${#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT')} + ' €'"></span>
-        </div>
+    </div>
 
-        <h3 style="margin-top:18px;">Gereserveerde materialen</h3>
-
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Aantal</th>
-                <th class="text-right">Prijs/dag</th>
-                <th class="text-right">Subtotaal</th>
-            </tr>
-
-            <tr th:each="item : ${order.items}">
-                <td th:text="${item.product.name}"></td>
-                <td th:text="${item.quantity}"></td>
-                <td class="text-right"
-                    th:text="${#numbers.formatDecimal(item.priceAtTime,1,'COMMA',2,'POINT')} + ' €'"></td>
-                <td class="text-right"
-                    th:text="${#numbers.formatDecimal(item.priceAtTime * item.quantity,1,'COMMA',2,'POINT')} + ' €'"></td>
-            </tr>
-        </table>
-
-        <div class="actions">
-            <a href="/orders" class="btn-secondary btn">Naar reservaties</a>
-            <a href="/catalog" class="btn">Verder winkelen</a>
-        </div>
+    <div class="note">
+        <strong>Tip:</strong> wil je nieuwe items reserveren? Ga naar de catalogus en voeg ze toe aan je mandje.
     </div>
 
 </div>

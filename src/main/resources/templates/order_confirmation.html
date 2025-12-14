@@ -1,46 +1,268 @@
 <!DOCTYPE html>
 <html lang="nl"
-      xmlns:th="http://www.thymeleaf.org">
-
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Bevestiging - Rental Platform</title>
+    <title>Bevestiging – Rental Platform</title>
 
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',Arial;background:#f4f6f8;color:#111;}
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
 
-        .container{
-            max-width:600px;margin:80px auto;width:95%;
-            background:white;padding:30px;border-radius:12px;
-            box-shadow:0 3px 10px rgba(0,0,0,0.12);
-            text-align:center;
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
         }
 
-        h1{margin-bottom:10px;}
-        p{margin:8px 0;font-size:16px;}
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
 
-        .btn{
-            margin-top:20px;padding:10px 16px;border-radius:7px;
-            background:#1e88e5;color:white;font-weight:600;
-            font-size:15px;text-decoration:none;display:inline-block;
+        /* ========== NAVBAR ========== */
+        nav{
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:600;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+        nav form{display:inline}
+        nav button{background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer}
+        nav button:hover{color:white}
+
+        .nav-cart{
+            position:relative;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
             transition:.2s;
         }
-        .btn:hover{background:#1565c0;}
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
+        }
+        .nav-cart svg{width:18px;height:18px;fill:white}
+        .cart-badge{
+            position:absolute;top:-6px;right:-8px;
+            background:var(--success);color:white;
+            font-size:11px;padding:2px 7px;border-radius:999px;
+            font-weight:800;border:2px solid var(--nav);
+        }
+
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:900px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
+        }
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+
+        /* ========== HERO CONFIRM CARD ========== */
+        .hero{
+            border-radius:24px;
+            overflow:hidden;
+            position:relative;
+            background:linear-gradient(135deg,var(--success),#16A34A);
+            box-shadow:0 18px 55px rgba(34,197,94,.22);
+            padding:26px;
+            color:white;
+        }
+        .hero::after{
+            content:"";
+            position:absolute;
+            inset:-50%;
+            background:
+                    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 45%),
+                    radial-gradient(circle at 70% 20%, rgba(255,255,255,.16), transparent 48%),
+                    radial-gradient(circle at 60% 80%, rgba(255,255,255,.12), transparent 52%);
+            transform:rotate(10deg);
+            opacity:.95;
+            pointer-events:none;
+        }
+
+        .hero-inner{position:relative;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+        .check{
+            width:58px;height:58px;border-radius:18px;
+            background:rgba(255,255,255,.16);
+            border:1px solid rgba(255,255,255,.25);
+            display:flex;align-items:center;justify-content:center;
+            animation:pop .5s ease-out;
+        }
+        @keyframes pop{
+            0%{transform:scale(.85);opacity:.6}
+            100%{transform:scale(1);opacity:1}
+        }
+        .check svg{width:26px;height:26px;fill:white}
+
+        .hero h1{
+            margin:0;
+            font-size:28px;
+            font-weight:900;
+            letter-spacing:-.02em;
+        }
+        .hero p{
+            margin:8px 0 0;
+            opacity:.92;
+            line-height:1.5;
+            max-width:640px;
+        }
+
+        /* ========== CARD BELOW ========== */
+        .card{
+            margin-top:18px;
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:22px;
+            box-shadow:0 14px 40px rgba(15,23,42,.10);
+            overflow:hidden;
+        }
+        .card-body{padding:18px}
+
+        .info{
+            background:rgba(15,23,42,.04);
+            border:1px solid rgba(15,23,42,.08);
+            border-radius:18px;
+            padding:14px 16px;
+            color:#334155;
+            line-height:1.5;
+            font-size:13px;
+        }
+        .info strong{color:#0f172a}
+
+        .actions{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-top:14px;
+        }
+        @media(max-width:760px){.actions{grid-template-columns:1fr}}
+
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:12px 14px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
+        }
+
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
+        }
+        .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
+
+        .btn-secondary{
+            background:#E5E7EB;
+            color:#111827;
+        }
+        .btn-secondary:hover{background:#D1D5DB}
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<nav>
+    <div class="nav-left">
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
+            </svg>
 
-    <h1>Bestelling bevestigd!</h1>
+            <!-- ✅ NULL-SAFE: voorkomt Whitelabel als cartCount niet in Model zit -->
+            <span class="cart-badge"
+                  th:if="${cartCount != null and cartCount > 0}"
+                  th:text="${cartCount}">0</span>
+        </a>
 
-    <p>Ordernummer: <strong th:text="${order.id}"></strong></p>
-    <p>Totaal per dag: <strong th:text="${order.totalPrice}"></strong> €</p>
-    <p>Aantal items: <strong th:text="${order.items.size()}"></strong></p>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders">Mijn reservaties</a>
+    </div>
 
-    <a href="/catalog" class="btn">Terug naar catalogus</a>
+    <div class="nav-right">
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
+        <span sec:authorize="isAuthenticated()">
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
+            </form>
+        </span>
+    </div>
+</nav>
+
+<div class="page">
+
+    <div class="hero">
+        <div class="hero-inner">
+            <div class="check">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                </svg>
+            </div>
+            <div>
+                <h1>Reservatie bevestigd</h1>
+                <p>
+                    Je reservatie is succesvol opgeslagen. Je kan je reservaties en details nu bekijken via “Mijn reservaties”.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="info">
+                <strong>Wat nu?</strong><br>
+                Je kan meteen je reservaties bekijken, of terug naar de catalogus gaan om nog materiaal te reserveren.
+            </div>
+
+            <div class="actions">
+                <a href="/orders" class="btn btn-primary">Mijn reservaties</a>
+                <a href="/catalog" class="btn btn-secondary">Terug naar catalogus</a>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 </body>

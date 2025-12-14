@@ -2,6 +2,7 @@ package be.ilyas.rentalplatform.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,8 +21,8 @@ public class RentalOrder {
     @ManyToOne
     private AppUser user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
     public RentalOrder() {}
 
@@ -61,13 +62,15 @@ public class RentalOrder {
         this.user = user;
     }
 
+    /**
+     * Zorgt ervoor dat de OrderItem(s) automatisch terugwijzen naar deze order.
+     * Belangrijk: items is nooit null (wordt standaard geïnitialiseerd).
+     */
     public void setItems(List<OrderItem> items) {
-        this.items = items;
+        this.items = (items != null) ? items : new ArrayList<>();
 
-        if (items != null) {
-            for (OrderItem oi : items) {
-                oi.setOrder(this);
-            }
+        for (OrderItem oi : this.items) {
+            oi.setOrder(this);
         }
     }
 

@@ -2,334 +2,357 @@
 <html lang="nl"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
-    <title>Mijn Profiel - Rental Platform</title>
+    <title>Profiel – Rental Platform</title>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f4f6f8;
-            color: #111;
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
         }
 
-        /* NAVBAR -------------------------------------------------------- */
-        nav {
-            background: #1c1c1c;
-            color: white;
-            padding: 15px 26px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
-            animation: fadeDown .4s ease;
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
+        nav{
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:600;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+        nav form{display:inline}
+        nav button{background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer}
+        nav button:hover{color:white}
+
+        .nav-cart{
+            position:relative;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
+            transition:.2s;
+        }
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
+        }
+        .nav-cart svg{width:18px;height:18px;fill:white}
+        .cart-badge{
+            position:absolute;top:-6px;right:-8px;
+            background:var(--success);color:white;
+            font-size:11px;padding:2px 7px;border-radius:999px;
+            font-weight:800;border:2px solid var(--nav);
         }
 
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to   { opacity: 1; transform: translateY(0); }
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1100px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
+        }
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
         }
 
-        nav a {
-            margin-right: 18px;
-            color: #d6d6d6;
-            transition: .2s;
-            font-weight: 500;
+        /* ========== HERO ========== */
+        .hero{
+            border-radius:24px;
+            overflow:hidden;
+            position:relative;
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            box-shadow:0 18px 55px rgba(99,102,241,.25);
+            padding:26px;
+            color:white;
         }
-        nav a:hover { color: #fff; }
-
-        nav form button {
-            background: none;
-            border: none;
-            color: #d6d6d6;
-            cursor: pointer;
-            font-size: 15px;
-            transition: .2s;
+        .hero::after{
+            content:"";
+            position:absolute;
+            inset:-50%;
+            background:
+                    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 45%),
+                    radial-gradient(circle at 70% 20%, rgba(255,255,255,.16), transparent 48%),
+                    radial-gradient(circle at 60% 80%, rgba(255,255,255,.12), transparent 52%);
+            transform:rotate(10deg);
+            opacity:.9;
+            pointer-events:none;
         }
-        nav form button:hover { color: #fff; }
-
-
-        /* PAGE CONTAINER ------------------------------------------------ */
-        .container {
-            width: 95%;
-            max-width: 950px;
-            margin: 40px auto;
-            animation: fadeIn .35s ease-out;
+        .hero-inner{
+            position:relative;
+            display:flex;
+            justify-content:space-between;
+            gap:18px;
+            align-items:flex-start;
+            flex-wrap:wrap;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .hero h1{
+            margin:0;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:-.02em;
         }
-
-
-        /* PROFILE CARD -------------------------------------------------- */
-        .profile-card {
-            background: white;
-            padding: 30px;
-            border-radius: 14px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-            animation: fadeUp .45s ease;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .hero p{
+            margin:10px 0 0;
+            opacity:.92;
+            line-height:1.5;
+            max-width:650px;
         }
 
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 22px;
-            margin-bottom: 25px;
+        .avatar{
+            width:60px;height:60px;
+            border-radius:18px;
+            background:rgba(255,255,255,.16);
+            border:1px solid rgba(255,255,255,.25);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:900;
+            font-size:18px;
         }
 
-        .avatar-wrapper {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-            border: 3px solid #eee;
-            transition: .25s;
+        /* ========== GRID ========== */
+        .grid{
+            display:grid;
+            grid-template-columns:1.6fr 1fr;
+            gap:18px;
+            margin-top:18px;
+            align-items:start;
+        }
+        @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+
+        /* ========== CARDS ========== */
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:22px;
+            box-shadow:0 14px 40px rgba(15,23,42,.10);
+            overflow:hidden;
+        }
+        .card-head{
+            padding:16px 18px;
+            border-bottom:1px solid #EEF2F7;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .card-head strong{font-size:14px}
+        .card-body{padding:16px 18px}
+
+        .field{
+            padding:12px 0;
+            border-bottom:1px solid #EEF2F7;
+        }
+        .field:last-child{border-bottom:none}
+        .label{
+            font-size:12px;
+            font-weight:900;
+            color:var(--text-muted);
+            letter-spacing:.05em;
+            text-transform:uppercase;
+        }
+        .value{
+            margin-top:6px;
+            font-weight:900;
+            font-size:16px;
+        }
+        .muted{
+            color:var(--text-muted);
+            font-size:13px;
+            line-height:1.5;
         }
 
-        .avatar-wrapper:hover {
-            transform: scale(1.03);
-            border-color: #1e88e5;
+        /* ========== QUICK ACTIONS ========== */
+        .actions{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+        }
+        .action{
+            padding:16px;
+            border-radius:20px;
+            border:1px solid var(--border);
+            background:#fff;
+            box-shadow:0 14px 40px rgba(15,23,42,.08);
+            transition:.25s;
+        }
+        .action:hover{
+            transform:translateY(-2px);
+            box-shadow:0 22px 55px rgba(15,23,42,.12);
+        }
+        .action h3{
+            margin:0 0 6px;
+            font-size:15px;
+            font-weight:900;
+        }
+        .action p{
+            margin:0;
+            color:var(--text-muted);
+            line-height:1.5;
+            font-size:13px;
         }
 
-        .avatar-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:12px 14px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
         }
-
-        .profile-info h2 {
-            margin-bottom: 4px;
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
         }
-
-        .profile-info p {
-            color: #555;
+        .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
+        .btn-secondary{
+            background:#E5E7EB;
+            color:#111827;
         }
-
-        /* TABS ----------------------------------------------------------- */
-        .tabs {
-            display: flex;
-            gap: 14px;
-            border-bottom: 2px solid #ddd;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 10px 16px;
-            cursor: pointer;
-            font-weight: 600;
-            border-radius: 8px 8px 0 0;
-            transition: .25s;
-        }
-
-        .tab:hover { background: #f0f0f0; }
-
-        .tab.active {
-            background: white;
-            border-bottom: 3px solid #1e88e5;
-            color: #1e88e5;
-        }
-
-        /* FORM ----------------------------------------------------------- */
-        .section {
-            display: none;
-            animation: fadeIn .35s ease-out;
-        }
-        .section.active { display: block; }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px 12px;
-            margin-bottom: 16px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 15px;
-            background: white;
-            transition: .25s;
-        }
-
-        input:focus {
-            border-color: #1e88e5;
-            box-shadow: 0 0 0 2px rgba(30,136,229,0.25);
-            outline: none;
-        }
-
-        .btn {
-            padding: 12px 18px;
-            border-radius: 7px;
-            background: #1e88e5;
-            color: white;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: .25s ease;
-            font-size: 15px;
-        }
-        .btn:hover { background: #1565c0; transform: translateY(-2px); }
-        .btn:active { transform: scale(.97); }
-
-        .save-area {
-            margin-top: 20px;
-        }
-
-        /* AVATAR UPLOAD -------------------------------------------------- */
-        .upload-block {
-            border: 2px dashed #ccc;
-            padding: 16px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            transition: .25s;
-        }
-        .upload-block:hover {
-            border-color: #1e88e5;
-            background: #f0f7ff;
-        }
-
-        .upload-block input {
-            margin: 10px auto;
-        }
-
+        .btn-secondary:hover{background:#D1D5DB}
     </style>
-
-    <script>
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-
-            document.getElementById(tab).classList.add('active');
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-        }
-    </script>
-
 </head>
 
 <body>
 
 <nav>
-    <div>
+    <div class="nav-left">
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
+            </svg>
+            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
+        </a>
+
+        <a href="/dashboard">Dashboard</a>
         <a href="/catalog">Catalogus</a>
-        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
-        <a href="/profile" sec:authorize="isAuthenticated()">Profiel</a>
+        <a href="/orders">Mijn reservaties</a>
     </div>
 
-    <div>
-        <span sec:authorize="isAuthenticated()">
-            Ingelogd als <strong sec:authentication="name"></strong> |
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button>Uitloggen</button>
-            </form>
-        </span>
-
+    <div class="nav-right">
         <span sec:authorize="!isAuthenticated()">
             <a href="/login">Inloggen</a>
             <a href="/register">Registreren</a>
         </span>
+        <span sec:authorize="isAuthenticated()">
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
+            </form>
+        </span>
     </div>
 </nav>
 
-<div class="container">
+<div class="page">
 
-    <div class="profile-card">
-
-        <div class="profile-header">
-            <div class="avatar-wrapper">
-                <img th:src="@{/uploads/profile/default.jpg}" alt="Profielfoto">
+    <div class="hero">
+        <div class="hero-inner">
+            <div>
+                <h1>Profiel</h1>
+                <p>
+                    Hier vind je je accountinformatie en snelle acties om je reservaties te beheren.
+                </p>
             </div>
 
-            <div class="profile-info">
-                <h2 th:text="${username}">Gebruiker</h2>
-                <p th:text="${email}"></p>
+            <div style="display:flex;gap:12px;align-items:center">
+                <div class="avatar" aria-label="Avatar">
+                    <span th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">A</span>
+                </div>
+                <div>
+                    <div style="opacity:.9;font-weight:900">Ingelogd als</div>
+                    <div style="font-size:16px;font-weight:900" sec:authentication="name">student</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <!-- ACCOUNT INFO -->
+        <div class="card">
+            <div class="card-head">
+                <strong>Accountgegevens</strong>
+                <span class="pill">Student</span>
+            </div>
+
+            <div class="card-body">
+                <div class="field">
+                    <div class="label">Gebruikersnaam</div>
+                    <div class="value" sec:authentication="name">student</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Status</div>
+                    <div class="value">Actief</div>
+                    <div class="muted" style="margin-top:6px">
+                        Je kan materiaal reserveren via de catalogus en je mandje.
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+                    <a href="/catalog" class="btn btn-secondary">Catalogus</a>
+                    <a href="/orders" class="btn btn-primary">Mijn reservaties</a>
+                </div>
             </div>
         </div>
 
-        <!-- TABS -->
-        <div class="tabs">
-            <div class="tab active" data-tab="profiel" onclick="switchTab('profiel')">Profiel</div>
-            <div class="tab" data-tab="account" onclick="switchTab('account')">Account</div>
-            <div class="tab" data-tab="security" onclick="switchTab('security')">Beveiliging</div>
-        </div>
-
-        <!-- TAB 1: PROFIEL -->
-        <div class="section active" id="profiel">
-
-            <form th:action="@{/profile/update}" method="post">
-
-                <label>Voornaam</label>
-                <input type="text" name="firstName" th:value="${firstName}">
-
-                <label>Achternaam</label>
-                <input type="text" name="lastName" th:value="${lastName}">
-
-                <label>Profielfoto</label>
-                <div class="upload-block">
-                    <p>Upload een nieuwe profielfoto</p>
-                    <input type="file" name="avatar">
+        <!-- QUICK ACTIONS -->
+        <div class="actions">
+            <div class="action">
+                <h3>Nieuwe reservatie</h3>
+                <p>Zoek materiaal en voeg het toe aan je mandje.</p>
+                <div style="margin-top:12px">
+                    <a href="/catalog" class="btn btn-primary">Materiaal bekijken</a>
                 </div>
+            </div>
 
-                <div class="save-area">
-                    <button class="btn">Wijzigingen opslaan</button>
+            <div class="action">
+                <h3>Mandje beheren</h3>
+                <p>Kies per item een einddatum. De prijs wordt automatisch berekend.</p>
+                <div style="margin-top:12px">
+                    <a href="/cart" class="btn btn-secondary">Naar mandje</a>
                 </div>
-
-            </form>
-
-        </div>
-
-        <!-- TAB 2: ACCOUNT -->
-        <div class="section" id="account">
-
-            <form th:action="@{/profile/email}" method="post">
-
-                <label>Huidig e-mailadres</label>
-                <input type="email" th:value="${email}" disabled>
-
-                <label>Nieuw e-mailadres</label>
-                <input type="email" name="newEmail">
-
-                <div class="save-area">
-                    <button class="btn">E-mailadres wijzigen</button>
-                </div>
-
-            </form>
-
-        </div>
-
-        <!-- TAB 3: SECURITY -->
-        <div class="section" id="security">
-
-            <form th:action="@{/profile/password}" method="post">
-
-                <label>Huidig wachtwoord</label>
-                <input type="password" name="oldPassword">
-
-                <label>Nieuw wachtwoord</label>
-                <input type="password" name="newPassword">
-
-                <label>Herhaal nieuw wachtwoord</label>
-                <input type="password" name="confirmPassword">
-
-                <div class="save-area">
-                    <button class="btn">Wachtwoord wijzigen</button>
-                </div>
-
-            </form>
-
+            </div>
         </div>
 
     </div>

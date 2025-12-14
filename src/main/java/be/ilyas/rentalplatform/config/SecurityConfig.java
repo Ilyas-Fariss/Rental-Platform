@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
+                                "/dashboard",          // ✅ dashboard publiek bereikbaar
                                 "/catalog",
                                 "/register",
                                 "/login",
@@ -38,22 +39,27 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**"
                         ).permitAll()
+
                         // winkelmandje en checkout enkel voor ingelogde users
                         .requestMatchers("/cart/**").authenticated()
+
+                        // profiel + orders enkel voor ingelogde users (aanrader)
+                        .requestMatchers("/profile/**", "/orders/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
 
                 // Form-based login met eigen loginpagina
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/catalog", true)
+                        .defaultSuccessUrl("/dashboard", true)
                         .permitAll()
                 )
 
                 // Logout-configuratie
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/catalog")
+                        .logoutSuccessUrl("/dashboard") // ✅ na logout terug dashboard
                         .permitAll()
                 );
 

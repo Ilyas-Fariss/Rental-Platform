@@ -24,10 +24,7 @@ public class CatalogController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("/")
-    public String homeRedirect() {
-        return "redirect:/catalog";
-    }
+
 
     @GetMapping("/catalog")
     public String showCatalog(@RequestParam(required = false) Long categoryId,
