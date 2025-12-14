@@ -50,7 +50,6 @@ public class CartService {
         cart.removeIf(item -> item.getProduct().getId().equals(productId));
     }
 
-    // ✅ nieuw: endDate updaten per product in cart
     public void updateEndDate(Long productId, LocalDate endDate, HttpSession session) {
         List<CartItem> cart = getOrCreateCart(session);
 
@@ -62,16 +61,14 @@ public class CartService {
         }
     }
 
-    // ✅ aantal dagen (vandaag -> endDate) inclusief
     private long getDays(LocalDate endDate) {
         LocalDate today = LocalDate.now();
         if (endDate == null) return 1;
 
-        long days = ChronoUnit.DAYS.between(today, endDate) + 1; // inclusief
+        long days = ChronoUnit.DAYS.between(today, endDate) + 1;
         return Math.max(days, 1);
     }
 
-    // ✅ totaal = dailyPrice * quantity * dagen
     public double calculateTotal(HttpSession session) {
         List<CartItem> cart = getOrCreateCart(session);
 
@@ -88,8 +85,8 @@ public class CartService {
         return cart.stream().mapToInt(CartItem::getQuantity).sum();
     }
 
+    // ✅ FIX: juiste key leegmaken
     public void clearCart(HttpSession session) {
-        session.setAttribute("cart", new java.util.ArrayList<>());
+        session.setAttribute(CART_SESSION_KEY, new ArrayList<CartItem>());
     }
-
 }

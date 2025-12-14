@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,13 +39,19 @@ public class OrderService {
         order.setUser(user);
         order.setCreatedAt(LocalDateTime.now());
 
+        // ✅ BELANGRIJK: items lijst initialiseren zodat add() altijd werkt
+        order.setItems(new ArrayList<>());
+
         double total = 0.0;
         int totalItems = 0;
 
-        // vandaag (startdatum) – als jij later een startdatum toevoegt, pas je dit hier aan
         LocalDate today = LocalDate.now();
 
         for (CartItem ci : cartItems) {
+
+            if (ci == null || ci.getProduct() == null || ci.getProduct().getId() == null) {
+                continue;
+            }
 
             Product p = productRepository.findById(ci.getProduct().getId()).orElse(null);
             if (p == null) {
@@ -52,6 +59,9 @@ public class OrderService {
             }
 
             int qty = ci.getQuantity();
+            if (qty <= 0) {
+                continue;
+            }
 
             // 1) STOCK CHECK
             if (p.getStock() < qty) {
@@ -66,19 +76,21 @@ public class OrderService {
             OrderItem oi = new OrderItem();
             oi.setProduct(p);
             oi.setQuantity(qty);
-            oi.setEndDate(ci.getEndDate()); // moet bestaan in CartItem, anders krijg je compile error
-            oi.setOrder(order);
 
-            order.getItems().add(oi);
-
-            // 4) PRIJS BEREKENEN (prijs/dag * qty * dagen)
             LocalDate end = ci.getEndDate();
             if (end == null || end.isBefore(today)) {
                 end = today; // fallback veilig
-                oi.setEndDate(today);
             }
+            oi.setEndDate(end);
 
+            // Koppel order ↔ item
+            oi.setOrder(order);
+            order.getItems().add(oi);
+
+            // 4) PRIJS BEREKENEN (prijs/dag * qty * dagen)
             long days = java.time.temporal.ChronoUnit.DAYS.between(today, end) + 1;
+            if (days < 1) days = 1;
+
             double itemPrice = p.getDailyPrice() * qty * days;
 
             total += itemPrice;
@@ -88,19 +100,20 @@ public class OrderService {
         order.setTotalPrice(total);
         order.setTotalItems(totalItems);
 
-        // 5) ORDER OPSLAAN (incl items door cascade)
+        // 5) ORDER OPSLAAN (items mee door cascade)
         RentalOrder saved = orderRepository.save(order);
 
-        // 6) CART LEEGMAKEN
+        // 6) CART LEEGMAKEN (juiste key)
         cartService.clearCart(session);
 
         return saved;
     }
-
+    @Transactional(readOnly = true)
     public List<RentalOrder> getOrdersForUser(AppUser user) {
         return orderRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
+    @Transactional(readOnly = true)
     public RentalOrder getOrderForUser(Long orderId, AppUser user) {
         return orderRepository.findByIdAndUser(orderId, user).orElse(null);
     }

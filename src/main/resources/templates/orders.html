@@ -227,7 +227,9 @@
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
             </svg>
-            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
+            <span class="cart-badge"
+                  th:if="${cartCount != null and cartCount > 0}"
+                  th:text="${cartCount}">0</span>
         </a>
 
         <a href="/dashboard">Dashboard</a>
@@ -285,7 +287,7 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Status</th>
+                    <th>Datum</th>
                     <th>Items</th>
                     <th>Totaal</th>
                     <th style="text-align:right"></th>
@@ -296,13 +298,9 @@
                 <tr th:each="o : ${orders}">
                     <td><span class="idtag" th:text="'#' + ${o.id}">#1</span></td>
 
-                    <!-- Veilig: als je geen status veld hebt, toon "Bevestigd" -->
-                    <td>
-                        <span class="status"
-                              th:text="${o.status != null ? o.status : 'Bevestigd'}">Bevestigd</span>
-                    </td>
+                    <td class="muted"
+                        th:text="${o.createdAt != null ? #temporals.format(o.createdAt, 'dd-MM-yyyy HH:mm') : '-'}">-</td>
 
-                    <!-- Veilig: als totalItems 0 is, zie je dat meteen -->
                     <td>
                         <span class="muted">Aantal: </span>
                         <strong th:text="${o.totalItems}">0</strong>

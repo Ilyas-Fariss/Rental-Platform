@@ -6,14 +6,12 @@ public class CartItem {
 
     private Product product;
     private int quantity;
-
-    // ✅ nieuw: tot wanneer lenen
     private LocalDate endDate;
 
     public CartItem(Product product, int quantity) {
         this.product = product;
         this.quantity = quantity;
-        this.endDate = LocalDate.now(); // default = vandaag (1 dag)
+        this.endDate = LocalDate.now();
     }
 
     public Product getProduct() {
@@ -37,6 +35,6 @@ public class CartItem {
     }
 
     public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+        this.endDate = (endDate == null) ? LocalDate.now() : endDate;
     }
 }

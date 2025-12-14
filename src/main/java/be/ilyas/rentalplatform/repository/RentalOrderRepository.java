@@ -12,4 +12,6 @@ public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> 
     List<RentalOrder> findByUserOrderByCreatedAtDesc(AppUser user);
 
     Optional<RentalOrder> findByIdAndUser(Long id, AppUser user);
+
+    long countByUser(AppUser user);
 }

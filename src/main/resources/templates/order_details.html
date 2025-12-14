@@ -263,7 +263,9 @@
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
             </svg>
-            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
+            <span class="cart-badge"
+                  th:if="${cartCount != null and cartCount > 0}"
+                  th:text="${cartCount}">0</span>
         </a>
 
         <a href="/dashboard">Dashboard</a>
@@ -296,8 +298,8 @@
         </div>
 
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <span class="idtag" th:text="'#' + ${order.id}">#1</span>
-            <span class="status" th:text="${order.status != null ? order.status : 'Bevestigd'}">Bevestigd</span>
+            <span class="idtag" th:text="${order != null ? ('#' + order.id) : '#?'}">#1</span>
+            <span class="status">Bevestigd</span>
             <a href="/orders" class="btn btn-secondary">Terug</a>
         </div>
     </div>
@@ -308,17 +310,17 @@
         <div class="card">
             <div class="card-head">
                 <strong>Items</strong>
-                <span class="pill">Overzicht</span>
+                <span class="pill"
+                      th:text="${order != null and order.items != null ? (#lists.size(order.items) + ' item(s)') : '0 item(s)'}">Overzicht</span>
             </div>
 
             <div class="card-body">
 
-                <!-- VEILIG: als items leeg/null zijn -->
-                <div class="empty" th:if="${order.items == null or #lists.isEmpty(order.items)}">
+                <div class="empty" th:if="${order == null or order.items == null or #lists.isEmpty(order.items)}">
                     Er zijn geen items gevonden voor deze reservatie.
                 </div>
 
-                <table th:if="${order.items != null and !#lists.isEmpty(order.items)}">
+                <table th:if="${order != null and order.items != null and !#lists.isEmpty(order.items)}">
                     <thead>
                     <tr>
                         <th>Product</th>
@@ -330,17 +332,22 @@
                     <tbody>
                     <tr th:each="it : ${order.items}">
                         <td>
-                            <div class="prod" th:text="${it.product.name}">Product</div>
+                            <div class="prod" th:text="${it.product != null ? it.product.name : 'Onbekend product'}">Product</div>
 
-                            <!-- Veilig: alleen tonen als dailyPrice bestaat -->
                             <div class="muted" th:if="${it.product != null}">
                                 Prijs/dag:
                                 <strong th:text="${#numbers.formatDecimal(it.product.dailyPrice,1,'COMMA',2,'POINT')} + ' €'">0,00 €</strong>
                             </div>
+
+                            <div class="muted"
+                                 th:if="${it.product != null and it.product.description != null and !#strings.isEmpty(it.product.description)}"
+                                 th:text="${it.product.description}">
+                                Beschrijving
+                            </div>
                         </td>
 
                         <td th:text="${it.quantity}">1</td>
-                        <td th:text="${it.endDate}">2025-12-18</td>
+                        <td th:text="${it.endDate != null ? it.endDate : '-'}">2025-12-18</td>
                     </tr>
                     </tbody>
                 </table>
@@ -356,26 +363,27 @@
             </div>
 
             <div class="card-body">
+
                 <div class="sumrow">
-                    <span class="label">Status</span>
-                    <span class="value" th:text="${order.status != null ? order.status : 'Bevestigd'}">Bevestigd</span>
+                    <span class="label">Datum</span>
+                    <span class="value" th:text="${order != null and order.createdAt != null ? #temporals.format(order.createdAt,'dd-MM-yyyy HH:mm') : '-'}">-</span>
                 </div>
 
                 <div class="sumrow">
                     <span class="label">Items</span>
-                    <span class="value" th:text="${order.totalItems}">0</span>
+                    <span class="value" th:text="${order != null ? order.totalItems : 0}">0</span>
                 </div>
 
                 <div class="sumrow">
                     <span class="label">Totaal</span>
                     <span class="value price"
-                          th:text="${#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT')} + ' €'">0,00 €</span>
+                          th:text="${order != null ? (#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT') + ' €') : '0,00 €'}">0,00 €</span>
                 </div>
 
                 <div class="totalbox">
                     <div class="label" style="font-weight:900;color:var(--text-muted)">Te betalen</div>
                     <div class="big price"
-                         th:text="${#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT')} + ' €'">0,00 €</div>
+                         th:text="${order != null ? (#numbers.formatDecimal(order.totalPrice,1,'COMMA',2,'POINT') + ' €') : '0,00 €'}">0,00 €</div>
                     <div class="muted" style="margin-top:6px">
                         De prijs is berekend op basis van de gekozen einddatums.
                     </div>
