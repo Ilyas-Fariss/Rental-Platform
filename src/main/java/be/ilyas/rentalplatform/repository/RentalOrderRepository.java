@@ -5,9 +5,13 @@ import be.ilyas.rentalplatform.model.RentalOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RentalOrderRepository extends JpaRepository<RentalOrder, Long> {
 
-    // Alle orders van een user, nieuwst eerst
     List<RentalOrder> findByUserOrderByCreatedAtDesc(AppUser user);
+
+    Optional<RentalOrder> findByIdAndUser(Long id, AppUser user);
+
+    long countByUser(AppUser user);
 }

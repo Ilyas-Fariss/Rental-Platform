@@ -1,332 +1,448 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Winkelmand - Rental Platform</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <title>Winkelmandje – Rental Platform</title>
 
     <style>
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f3f4f6;
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
+
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
         }
 
-        .page-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 16px 40px;
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
+        nav{
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:600;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+        nav form{display:inline}
+        nav button{background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer}
+        nav button:hover{color:white}
+
+        .nav-cart{
+            position:relative;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
+            transition:.2s;
+        }
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
+        }
+        .nav-cart svg{width:18px;height:18px;fill:white}
+        .cart-badge{
+            position:absolute;top:-6px;right:-8px;
+            background:var(--success);color:white;
+            font-size:11px;padding:2px 7px;border-radius:999px;
+            font-weight:800;border:2px solid var(--nav);
         }
 
-        h1 {
-            font-size: 32px;
-            margin-bottom: 4px;
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1300px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
+        }
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
         }
 
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 28px;
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
         }
 
-        .cart-layout {
-            display: grid;
-            grid-template-columns: 3fr 1.4fr;
-            gap: 26px;
+        h1{
+            margin:0;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:-.02em;
+        }
+        .subtitle{color:var(--text-muted);margin-top:6px}
+
+        .pill{
+            display:inline-block;
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:.04em;
+            padding:6px 10px;
+            border-radius:999px;
+            background:#EEF2FF;
+            border:1px solid #E0E7FF;
+            color:var(--primary-dark);
         }
 
-        @media (max-width: 950px) {
-            .cart-layout {
-                grid-template-columns: 1fr;
-            }
+        /* ========== LAYOUT ========== */
+        .grid{
+            display:grid;
+            grid-template-columns:2.2fr 1fr;
+            gap:18px;
+            align-items:start;
+        }
+        @media(max-width:1000px){
+            .grid{grid-template-columns:1fr}
         }
 
-        .card {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 20px 24px;
-            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+        /* ========== CARDS ========== */
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:20px;
+            box-shadow:0 14px 40px rgba(15,23,42,.10);
+            overflow:hidden;
+        }
+        .card-head{
+            padding:16px 18px;
+            border-bottom:1px solid #EEF2F7;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .card-head strong{font-size:14px}
+        .card-body{padding:16px 18px}
+
+        /* ========== TABLE ========== */
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:12px 10px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+        th{
+            text-align:left;
+            font-size:12px;
+            font-weight:900;
+            color:var(--text-muted);
+            letter-spacing:.05em;
+            text-transform:uppercase;
+        }
+        tr:last-child td{border-bottom:none}
+
+        .product-title{font-weight:900;font-size:15px}
+        .muted{color:var(--text-muted);font-size:12px;margin-top:4px;line-height:1.45}
+
+        .price{font-weight:900}
+
+        /* ========== INPUTS ========== */
+        input[type="date"]{
+            width:100%;
+            padding:10px 12px;
+            border-radius:12px;
+            border:1px solid #D1D5DB;
+            background:#F9FAFB;
+            font-size:14px;
+        }
+        input[type="date"]:focus{
+            outline:none;
+            border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(99,102,241,.25);
+            background:white;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
+        /* ========== BUTTONS ========== */
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:12px 14px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
         }
 
-        th, td {
-            padding: 12px 8px;
-            text-align: left;
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
+        }
+        .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
+
+        .btn-secondary{
+            background:#E5E7EB;
+            color:#111827;
+        }
+        .btn-secondary:hover{background:#D1D5DB}
+
+        .btn-danger{
+            background:linear-gradient(135deg,#EF4444,#DC2626);
+            color:white;
+        }
+        .btn-danger:hover{transform:translateY(-1px);filter:brightness(1.05)}
+
+        .btn-sm{
+            width:auto;
+            padding:10px 12px;
+            border-radius:12px;
+            font-size:13px;
         }
 
-        thead th {
-            border-bottom: 1px solid #e5e7eb;
-            color: #6b7280;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
+        /* ========== SUMMARY ========== */
+        .summary{
+            display:flex;
+            flex-direction:column;
+            gap:10px;
         }
 
-        tbody tr + tr {
-            border-top: 1px solid #f3f4f6;
+        .sumrow{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:10px 0;
+            border-bottom:1px solid #EEF2F7;
+        }
+        .sumrow:last-child{border-bottom:none}
+        .sumrow .label{color:var(--text-muted);font-weight:800}
+        .sumrow .value{font-weight:900}
+
+        .totalbox{
+            margin-top:8px;
+            padding:14px;
+            border-radius:18px;
+            background:rgba(99,102,241,.08);
+            border:1px solid rgba(99,102,241,.18);
+        }
+        .totalbox .big{
+            font-size:20px;
+            font-weight:900;
         }
 
-        .product-name {
-            font-weight: 600;
+        /* ========== EMPTY STATE ========== */
+        .empty{
+            padding:26px;
+            text-align:center;
         }
+        .empty h2{
+            margin:0;
+            font-size:20px;
+            font-weight:900;
+        }
+        .empty p{margin:10px 0 18px;color:var(--text-muted)}
 
-        .product-meta {
-            font-size: 12px;
-            color: #6b7280;
+        /* ========== SNACKBAR ========== */
+        .snack{
+            position:fixed;
+            left:50%;
+            transform:translateX(-50%);
+            bottom:18px;
+            background:rgba(15,23,42,.96);
+            color:white;
+            padding:12px 14px;
+            border-radius:14px;
+            box-shadow:0 16px 40px rgba(0,0,0,.25);
+            opacity:0;
+            pointer-events:none;
+            transition:.25s;
+            min-width:260px;
+            text-align:center;
+            font-weight:800;
         }
-
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            margin-top: 4px;
-        }
-
-        .qty-input {
-            width: 56px;
-            padding: 6px 8px;
-            border-radius: 999px;
-            border: 1px solid #e5e7eb;
-            text-align: center;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .pill {
-            border-radius: 999px;
-            border: none;
-            padding: 7px 16px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-        }
-
-        .pill-blue {
-            background: #1d4ed8;
-            color: white;
-            box-shadow: 0 10px 18px rgba(37, 99, 235, 0.25);
-        }
-
-        .pill-blue:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(37, 99, 235, 0.35);
-        }
-
-        .pill-red {
-            background: #ef4444;
-            color: white;
-            box-shadow: 0 10px 18px rgba(248, 113, 113, 0.25);
-        }
-
-        .pill-red:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(239, 68, 68, 0.35);
-        }
-
-        .price {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .summary-title {
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 6px;
-            font-size: 14px;
-        }
-
-        .summary-label {
-            color: #6b7280;
-        }
-
-        .summary-value {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .summary-row.total {
-            margin-top: 14px;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .summary-actions {
-            margin-top: 22px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn-primary,
-        .btn-danger {
-            border-radius: 999px;
-            border: none;
-            padding: 10px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-primary {
-            background: #1d4ed8;
-            color: white;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(37, 99, 235, 0.35);
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-            box-shadow: 0 10px 20px rgba(248, 113, 113, 0.25);
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 26px rgba(239, 68, 68, 0.35);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 16px;
-            color: #6b7280;
-        }
-
-        .empty-state h2 {
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
+        .snack.show{opacity:1;bottom:26px}
     </style>
 </head>
+
 <body>
 
-<div class="page-container">
-    <h1>Winkelmand</h1>
-    <p class="subtitle">Overzicht van het materiaal dat je momenteel wil reserveren.</p>
+<nav>
+    <div class="nav-left">
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
+            </svg>
+            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
+        </a>
 
-    <div class="cart-layout">
-        <!-- Linkerkant: tabel met items -->
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders">Mijn reservaties</a>
+    </div>
+
+    <div class="nav-right">
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
+        <span sec:authorize="isAuthenticated()">
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
+            </form>
+        </span>
+    </div>
+</nav>
+
+<div class="page">
+
+    <div class="topbar">
+        <div>
+            <h1>Winkelmandje</h1>
+            <div class="subtitle">Kies per item een einddatum. Prijs wordt automatisch berekend.</div>
+        </div>
+        <span class="pill" th:if="${!#lists.isEmpty(items)}" th:text="${#lists.size(items)} + ' item(s)'">0 item(s)</span>
+    </div>
+
+    <!-- EMPTY -->
+    <div class="card" th:if="${#lists.isEmpty(items)}">
+        <div class="empty">
+            <h2>Je mandje is leeg</h2>
+            <p>Ga naar de catalogus en voeg materiaal toe.</p>
+            <a href="/catalog" class="btn btn-primary" style="max-width:280px;margin:0 auto">Naar catalogus</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="grid" th:if="${!#lists.isEmpty(items)}">
+
+        <!-- ITEMS -->
         <div class="card">
-            <div th:if="${#lists.isEmpty(items)}" class="empty-state">
-                <h2>Je winkelmandje is leeg</h2>
-                <p>Ga naar de catalogus om materiaal te kiezen voor je volgende project of voorstelling.</p>
-                <a th:href="@{/catalog}" class="btn-primary">Naar catalogus</a>
+            <div class="card-head">
+                <strong>Items in je mandje</strong>
+                <span class="pill">Per item einddatum</span>
             </div>
 
-            <div th:if="${!#lists.isEmpty(items)}">
+            <div class="card-body">
                 <table>
-                    <thead>
                     <tr>
-                        <th>MATERIAAL</th>
-                        <th>AANTAL</th>
-                        <th>PRIJS / DAG</th>
-                        <th>SUBTOTAAL</th>
+                        <th>Product</th>
+                        <th>Aantal</th>
+                        <th style="text-align:right">Lenen tot</th>
+                        <th style="text-align:right">Prijs/dag</th>
+                        <th style="text-align:right">Totaal</th>
                         <th></th>
                     </tr>
-                    </thead>
-                    <tbody>
+
                     <tr th:each="item : ${items}">
                         <td>
-                            <div class="product-name" th:text="${item.product.name}">Productnaam</div>
-                            <div class="product-meta">
-                                Voorraad:
-                                <span th:text="${item.product.stock}">0</span>
+                            <div class="product-title" th:text="${item.product.name}">Product</div>
+                            <div class="muted">
+                                Dagen:
+                                <strong th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1}">1</strong>
+                                • Formule: prijs/dag × aantal × dagen
                             </div>
-                            <div class="tag" th:text="${item.product.category.name}">Categorie</div>
                         </td>
-                        <td>
-                            <!-- Alleen weergave van aantal (geen update-functionaliteit hier) -->
-                            <input class="qty-input" type="number" min="1"
-                                   th:value="${item.quantity}" readonly/>
-                        </td>
-                        <td class="price"
-                            th:text="${#numbers.formatDecimal(item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
-                            0,00 €
-                        </td>
-                        <td class="price"
-                            th:text="${#numbers.formatDecimal(item.quantity * item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
-                            0,00 €
-                        </td>
-                        <td>
-                            <form th:action="@{/cart/remove}" method="post" th:object="${item}">
-                                <input type="hidden" name="productId"
-                                       th:value="${item.product.id}"/>
-                                <button type="submit" class="pill pill-red">Verwijderen</button>
+
+                        <td th:text="${item.quantity}">1</td>
+
+                        <td style="text-align:right;min-width:180px">
+                            <form th:action="@{'/cart/update-date/' + ${item.product.id}}"
+                                  method="post">
+                                <input type="date"
+                                       name="endDate"
+                                       th:value="${item.endDate}"
+                                       th:min="${today}"
+                                       onchange="showSnack('Datum aangepast. Totaal wordt herberekend...'); this.form.submit();">
                             </form>
                         </td>
+
+                        <td style="text-align:right" class="price"
+                            th:text="${#numbers.formatDecimal(item.product.dailyPrice,1,'COMMA',2,'POINT')} + ' €'">
+                            0,00 €
+                        </td>
+
+                        <td style="text-align:right" class="price"
+                            th:text="${#numbers.formatDecimal(
+                                item.product.dailyPrice * item.quantity *
+                                (T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1),
+                                1,'COMMA',2,'POINT')} + ' €'">
+                            0,00 €
+                        </td>
+
+                        <td style="text-align:right">
+                            <a th:href="@{'/cart/remove/' + ${item.product.id}}"
+                               class="btn btn-danger btn-sm"
+                               onclick="showSnack('Item verwijderd.');">
+                                Verwijder
+                            </a>
+                        </td>
                     </tr>
-                    </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Rechterkant: samenvatting -->
+        <!-- SUMMARY -->
         <div class="card">
-            <div class="summary-title">Samenvatting</div>
+            <div class="card-head">
+                <strong>Samenvatting</strong>
+                <span class="pill">Checkout</span>
+            </div>
 
-            <div class="summary-row">
-                <div class="summary-label">Totaal aantal items</div>
-                <div class="summary-value"
-                     th:text="${#lists.isEmpty(items) ? 0 : #lists.size(items)}">
-                    0
+            <div class="card-body summary">
+                <div class="sumrow">
+                    <span class="label">Totaal (gekozen periode)</span>
+                    <span class="value" th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'">0,00 €</span>
                 </div>
-            </div>
 
-            <div class="summary-row total">
-                <div class="summary-label">Totaalprijs per dag</div>
-                <div class="summary-value"
-                     th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
-                    0,00 €
+                <div class="totalbox">
+                    <div class="label" style="font-weight:900;color:var(--text-muted)">Te betalen</div>
+                    <div class="big" th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'">0,00 €</div>
+                    <div class="muted" style="margin-top:6px">
+                        Tip: controleer je einddatums voordat je bevestigt.
+                    </div>
                 </div>
-            </div>
 
-            <div class="summary-actions" th:if="${!#lists.isEmpty(items)}">
-                <!-- LET OP: hier staat nu de JUISTE URL: /cart/checkout -->
-                <a th:href="@{/cart/checkout}" class="btn-primary">
-                    Doorgaan naar checkout
-                </a>
-
-                <form th:action="@{/cart/clear}" method="post">
-                    <button type="submit" class="btn-danger">
-                        Mandje leegmaken
-                    </button>
-                </form>
-            </div>
-
-            <div class="summary-actions" th:if="${#lists.isEmpty(items)}">
-                <a th:href="@{/catalog}" class="btn-primary">
-                    Terug naar catalogus
-                </a>
+                <a href="/cart/checkout" class="btn btn-primary">Verder naar checkout</a>
+                <a href="/catalog" class="btn btn-secondary">Verder winkelen</a>
             </div>
         </div>
+
     </div>
 </div>
+
+<div id="snack" class="snack">...</div>
+<script>
+    function showSnack(msg){
+        const el = document.getElementById('snack');
+        el.textContent = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 1200);
+    }
+</script>
 
 </body>
 </html>

@@ -1,15 +1,13 @@
 package be.ilyas.rentalplatform.service;
 
-import be.ilyas.rentalplatform.model.AppUser;
-import be.ilyas.rentalplatform.model.CartItem;
-import be.ilyas.rentalplatform.model.OrderItem;
-import be.ilyas.rentalplatform.model.Product;
-import be.ilyas.rentalplatform.model.RentalOrder;
+import be.ilyas.rentalplatform.model.*;
 import be.ilyas.rentalplatform.repository.ProductRepository;
 import be.ilyas.rentalplatform.repository.RentalOrderRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,82 +15,106 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    private final RentalOrderRepository rentalOrderRepository;
-    private final CartService cartService;
+    private final RentalOrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final CartService cartService;
 
-    public OrderService(RentalOrderRepository rentalOrderRepository,
-                        CartService cartService,
-                        ProductRepository productRepository) {
-        this.rentalOrderRepository = rentalOrderRepository;
-        this.cartService = cartService;
+    public OrderService(RentalOrderRepository orderRepository,
+                        ProductRepository productRepository,
+                        CartService cartService) {
+        this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.cartService = cartService;
     }
 
-    /**
-     * Maakt een nieuwe order op basis van het huidige winkelmandje in de sessie.
-     * - Maakt RentalOrder + OrderItems
-     * - Past de stock aan van de producten
-     * - Leegt daarna het mandje
-     */
+    @Transactional
     public RentalOrder createOrderFromCart(AppUser user, HttpSession session) {
-        List<CartItem> cartItems = cartService.getAllItems(session);
 
+        List<CartItem> cartItems = cartService.getAllItems(session);
         if (cartItems == null || cartItems.isEmpty()) {
-            return null; // niets te bestellen
+            return null;
         }
 
         RentalOrder order = new RentalOrder();
         order.setUser(user);
         order.setCreatedAt(LocalDateTime.now());
 
-        List<OrderItem> orderItems = new ArrayList<>();
+        // ✅ BELANGRIJK: items lijst initialiseren zodat add() altijd werkt
+        order.setItems(new ArrayList<>());
+
+        double total = 0.0;
         int totalItems = 0;
-        double totalPrice = 0.0;
 
-        for (CartItem cartItem : cartItems) {
-            Product product = cartItem.getProduct();
+        LocalDate today = LocalDate.now();
 
-            // OrderItem aanmaken
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPriceAtTime(product.getDailyPrice());
+        for (CartItem ci : cartItems) {
 
-            orderItems.add(orderItem);
-
-            totalItems += cartItem.getQuantity();
-            totalPrice += cartItem.getQuantity() * product.getDailyPrice();
-
-            // Stock aanpassen (heel basic, zonder extra checks)
-            int newStock = product.getStock() - cartItem.getQuantity();
-            if (newStock < 0) {
-                newStock = 0;
+            if (ci == null || ci.getProduct() == null || ci.getProduct().getId() == null) {
+                continue;
             }
-            product.setStock(newStock);
-            productRepository.save(product);
+
+            Product p = productRepository.findById(ci.getProduct().getId()).orElse(null);
+            if (p == null) {
+                continue;
+            }
+
+            int qty = ci.getQuantity();
+            if (qty <= 0) {
+                continue;
+            }
+
+            // 1) STOCK CHECK
+            if (p.getStock() < qty) {
+                throw new IllegalStateException("Not enough stock for: " + p.getName());
+            }
+
+            // 2) STOCK UPDATE
+            p.setStock(p.getStock() - qty);
+            productRepository.save(p);
+
+            // 3) ORDER ITEM MAKEN
+            OrderItem oi = new OrderItem();
+            oi.setProduct(p);
+            oi.setQuantity(qty);
+
+            LocalDate end = ci.getEndDate();
+            if (end == null || end.isBefore(today)) {
+                end = today; // fallback veilig
+            }
+            oi.setEndDate(end);
+
+            // Koppel order ↔ item
+            oi.setOrder(order);
+            order.getItems().add(oi);
+
+            // 4) PRIJS BEREKENEN (prijs/dag * qty * dagen)
+            long days = java.time.temporal.ChronoUnit.DAYS.between(today, end) + 1;
+            if (days < 1) days = 1;
+
+            double itemPrice = p.getDailyPrice() * qty * days;
+
+            total += itemPrice;
+            totalItems += qty;
         }
 
-        order.setItems(orderItems);
+        order.setTotalPrice(total);
         order.setTotalItems(totalItems);
-        order.setTotalPrice(totalPrice);
 
-        RentalOrder savedOrder = rentalOrderRepository.save(order);
+        // 5) ORDER OPSLAAN (items mee door cascade)
+        RentalOrder saved = orderRepository.save(order);
 
-        // mandje leegmaken
+        // 6) CART LEEGMAKEN (juiste key)
         cartService.clearCart(session);
 
-        return savedOrder;
+        return saved;
     }
-
+    @Transactional(readOnly = true)
     public List<RentalOrder> getOrdersForUser(AppUser user) {
-        return rentalOrderRepository.findByUserOrderByCreatedAtDesc(user);
+        return orderRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
+    @Transactional(readOnly = true)
     public RentalOrder getOrderForUser(Long orderId, AppUser user) {
-        return rentalOrderRepository.findById(orderId)
-                .filter(o -> o.getUser().getId().equals(user.getId()))
-                .orElse(null);
+        return orderRepository.findByIdAndUser(orderId, user).orElse(null);
     }
 }

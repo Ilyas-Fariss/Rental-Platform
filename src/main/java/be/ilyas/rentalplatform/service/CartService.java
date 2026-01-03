@@ -5,32 +5,35 @@ import be.ilyas.rentalplatform.model.Product;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CartService {
 
-    public static final String SESSION_KEY = "CART_ITEMS";
+    private static final String CART_SESSION_KEY = "CART_ITEMS";
 
     @SuppressWarnings("unchecked")
-    private List<CartItem> getCart(HttpSession session) {
-        Object attr = session.getAttribute(SESSION_KEY);
-        if (attr == null) {
-            List<CartItem> list = new ArrayList<>();
-            session.setAttribute(SESSION_KEY, list);
-            return list;
+    private List<CartItem> getOrCreateCart(HttpSession session) {
+        Object obj = session.getAttribute(CART_SESSION_KEY);
+
+        if (obj == null) {
+            List<CartItem> newCart = new ArrayList<>();
+            session.setAttribute(CART_SESSION_KEY, newCart);
+            return newCart;
         }
-        return (List<CartItem>) attr;
+
+        return (List<CartItem>) obj;
     }
 
     public List<CartItem> getAllItems(HttpSession session) {
-        // kopie zodat de originele lijst in de sessie veilig blijft
-        return new ArrayList<>(getCart(session));
+        return getOrCreateCart(session);
     }
 
-    public void addProduct(HttpSession session, Product product) {
-        List<CartItem> cart = getCart(session);
+    public void addToCart(Product product, HttpSession session) {
+        List<CartItem> cart = getOrCreateCart(session);
 
         for (CartItem item : cart) {
             if (item.getProduct().getId().equals(product.getId())) {
@@ -42,30 +45,48 @@ public class CartService {
         cart.add(new CartItem(product, 1));
     }
 
-    public void removeProduct(HttpSession session, Long productId) {
-        List<CartItem> cart = getCart(session);
+    public void removeFromCart(Long productId, HttpSession session) {
+        List<CartItem> cart = getOrCreateCart(session);
         cart.removeIf(item -> item.getProduct().getId().equals(productId));
     }
 
-    public void clearCart(HttpSession session) {
-        session.removeAttribute(SESSION_KEY);
+    public void updateEndDate(Long productId, LocalDate endDate, HttpSession session) {
+        List<CartItem> cart = getOrCreateCart(session);
+
+        for (CartItem item : cart) {
+            if (item.getProduct().getId().equals(productId)) {
+                item.setEndDate(endDate);
+                return;
+            }
+        }
+    }
+
+    private long getDays(LocalDate endDate) {
+        LocalDate today = LocalDate.now();
+        if (endDate == null) return 1;
+
+        long days = ChronoUnit.DAYS.between(today, endDate) + 1;
+        return Math.max(days, 1);
+    }
+
+    public double calculateTotal(HttpSession session) {
+        List<CartItem> cart = getOrCreateCart(session);
+
+        double total = 0.0;
+        for (CartItem item : cart) {
+            long days = getDays(item.getEndDate());
+            total += item.getProduct().getDailyPrice() * item.getQuantity() * days;
+        }
+        return total;
     }
 
     public int getCartCount(HttpSession session) {
-        List<CartItem> cart = getCart(session);
-        int total = 0;
-        for (CartItem item : cart) {
-            total += item.getQuantity();
-        }
-        return total;
+        List<CartItem> cart = getOrCreateCart(session);
+        return cart.stream().mapToInt(CartItem::getQuantity).sum();
     }
 
-    public double getTotalPrice(HttpSession session) {
-        List<CartItem> cart = getCart(session);
-        double total = 0.0;
-        for (CartItem item : cart) {
-            total += item.getQuantity() * item.getProduct().getDailyPrice();
-        }
-        return total;
+    // ✅ FIX: juiste key leegmaken
+    public void clearCart(HttpSession session) {
+        session.setAttribute(CART_SESSION_KEY, new ArrayList<CartItem>());
     }
 }

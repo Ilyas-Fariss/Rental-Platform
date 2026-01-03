@@ -1,100 +1,263 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Registreren - Rental Platform</title>
+    <title>Registreren – Rental Platform</title>
+
     <style>
-        :root{--primary:#22c55e;--primary-dark:#16a34a;--bg:#020617;--card-bg:#020617;--text-main:#e5e7eb;--text-muted:#9ca3af;}
-        *{box-sizing:border-box;}
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
+
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
+        }
+
+        *{box-sizing:border-box}
         body{
             margin:0;
-            font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-            background:radial-gradient(circle at top,#059669,#020617 55%);
-            color:var(--text-main);
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:linear-gradient(135deg,#0B1220,#111827 35%, #1D4ED8 100%);
             min-height:100vh;
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
+        nav{
+            background:rgba(15,23,42,.92);
+            color:white;
+            padding:14px 28px;
             display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 10px 30px rgba(0,0,0,.35);
+            position:sticky;
+            top:0;
+            z-index:100;
+            backdrop-filter: blur(10px);
+        }
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:700;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+
+        /* ========== PAGE LAYOUT ========== */
+        .page{
+            width:95%;
+            max-width:1100px;
+            margin:28px auto;
+            display:grid;
+            grid-template-columns:1.1fr .9fr;
+            gap:18px;
+            align-items:stretch;
+            animation:fadeUp .45s ease-out;
+        }
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+        @media(max-width:1000px){.page{grid-template-columns:1fr}}
+
+        /* ========== LEFT HERO ========== */
+        .hero{
+            border-radius:24px;
+            overflow:hidden;
+            position:relative;
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            box-shadow:0 18px 55px rgba(99,102,241,.25);
+            padding:26px;
+            color:white;
+            min-height:460px;
+        }
+        .hero::after{
+            content:"";
+            position:absolute;
+            inset:-50%;
+            background:
+                    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 45%),
+                    radial-gradient(circle at 70% 20%, rgba(255,255,255,.16), transparent 48%),
+                    radial-gradient(circle at 60% 80%, rgba(255,255,255,.12), transparent 52%);
+            transform:rotate(10deg);
+            opacity:.95;
+            pointer-events:none;
+        }
+        .hero-inner{position:relative}
+        .hero h1{margin:0;font-size:30px;font-weight:900;letter-spacing:-.02em}
+        .hero p{margin:10px 0 0;opacity:.92;line-height:1.55;max-width:520px}
+
+        .hero-card{
+            margin-top:18px;
+            background:rgba(255,255,255,.14);
+            border:1px solid rgba(255,255,255,.22);
+            border-radius:20px;
+            padding:16px;
+            max-width:520px;
+        }
+        .hero-card strong{display:block;font-size:14px}
+        .hero-card span{display:block;margin-top:6px;opacity:.92;line-height:1.5;font-size:13px}
+
+        /* ========== FORM CARD ========== */
+        .card{
+            background:rgba(255,255,255,.96);
+            border:1px solid rgba(229,231,235,.7);
+            border-radius:24px;
+            box-shadow:0 18px 55px rgba(15,23,42,.25);
+            overflow:hidden;
+        }
+        .card-head{
+            padding:18px 18px 14px;
+            border-bottom:1px solid #EEF2F7;
+            background:linear-gradient(180deg, rgba(99,102,241,.08), rgba(255,255,255,0));
+        }
+        .card-head h2{margin:0;font-size:18px;font-weight:900}
+        .card-head p{
+            margin:8px 0 0;
+            color:var(--text-muted);
+            line-height:1.5;
+            font-size:13px;
+        }
+        .card-body{padding:18px}
+
+        .alert-error{
+            margin-top:12px;
+            background:rgba(239,68,68,.12);
+            border:1px solid rgba(239,68,68,.25);
+            padding:12px 14px;
+            border-radius:16px;
+            color:#991B1B;
+            font-weight:900;
+            font-size:13px;
+        }
+
+        label{
+            display:block;
+            font-size:12px;
+            font-weight:900;
+            color:var(--text-muted);
+            letter-spacing:.05em;
+            text-transform:uppercase;
+            margin:10px 0 6px;
+        }
+        input{
+            width:100%;
+            padding:11px 14px;
+            border-radius:14px;
+            border:1px solid #D1D5DB;
+            background:#F9FAFB;
+            font-size:14px;
+            transition:.2s;
+        }
+        input:focus{
+            outline:none;
+            border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(99,102,241,.25);
+            background:white;
+        }
+
+        .btn{
+            display:inline-flex;
             align-items:center;
             justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:12px 14px;
+            border-radius:999px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
+            margin-top:14px;
+            background:linear-gradient(135deg,#22C55E,#A3E635);
+            color:#052e16;
+            box-shadow:0 14px 30px rgba(34,197,94,.35);
         }
-        .shell{width:100%;max-width:460px;padding:24px;}
-        .logo-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;color:#fff;}
-        .logo-circle{width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#22c55e,#4ade80);}
-        .card{background:rgba(15,23,42,0.95);border-radius:18px;padding:22px 24px 26px;box-shadow:0 18px 45px rgba(15,23,42,0.8);backdrop-filter:blur(10px);}
-        h1{margin:0 0 4px;font-size:24px;}
-        .subtitle{margin:0 0 18px;color:var(--text-muted);font-size:14px;}
-        label{display:block;font-size:13px;font-weight:500;margin-bottom:4px;}
-        input[type="text"],input[type="email"],input[type="password"]{
-            width:100%;padding:9px 11px;border-radius:10px;
-            border:1px solid #1f2937;background:#020617;
-            color:#e5e7eb;font-size:14px;
+        .btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+
+        .hint{
+            margin-top:12px;
+            color:rgba(255,255,255,.85);
+            font-size:13px;
+            line-height:1.5;
+            text-align:center;
         }
-        input:focus{outline:none;border-color:#4ade80;}
-        .field{margin-bottom:14px;}
-        .btn{width:100%;border-radius:999px;border:none;padding:9px 16px;font-size:15px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff;}
-        .btn:hover{background:var(--primary-dark);}
-        .extra{margin-top:14px;font-size:13px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;}
-        a{color:#bbf7d0;text-decoration:none;}
-        a:hover{text-decoration:underline;}
-        .error{background:#7f1d1d;color:#fee2e2;padding:8px 10px;border-radius:10px;font-size:13px;margin-bottom:12px;}
+        .hint a{color:white;font-weight:900}
+        .hint a:hover{text-decoration:underline}
     </style>
 </head>
+
 <body>
 
-<div class="shell">
-    <div class="logo-row">
-        <div class="logo-circle">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24" width="18" height="18">
-                <path fill="#ffffff"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9
-                         2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22
-                         17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.53c.75 0 1.4-.41
-                         1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22
-                         4.76 4 4.38 4H2v2h1l3.6 7.59-1.35 2.44
-                         C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
-            </svg>
-        </div>
-        <div>
-            <div style="font-weight:700;">Rental Platform</div>
-            <div style="font-size:12px;color:#9ca3af;">Student equipment booking</div>
+<nav>
+    <div class="nav-left">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+    </div>
+    <div class="nav-right">
+        <a href="/login">Inloggen</a>
+        <a href="/register">Registreren</a>
+    </div>
+</nav>
+
+<div class="page">
+
+    <div class="hero">
+        <div class="hero-inner">
+            <h1>Maak je account aan</h1>
+            <p>
+                Registreer je als student om materiaal te reserveren. Daarna kan je meteen naar je dashboard en catalogus.
+            </p>
+
+            <div class="hero-card">
+                <strong>Wat krijg je?</strong>
+                <span>
+                    Toegang tot de catalogus, winkelmand met einddatum per item en automatische prijsberekening op basis van dagen.
+                </span>
+            </div>
         </div>
     </div>
 
-    <div class="card">
-        <h1>Account aanmaken</h1>
-        <p class="subtitle">
-            Maak een persoonlijk account aan om materiaal te reserveren.
-        </p>
+    <div>
+        <div class="card">
+            <div class="card-head">
+                <h2>Registreren</h2>
+                <p>Vul je gegevens in om een account aan te maken.</p>
 
-        <div th:if="${error != null}" class="error" th:text="${error}">
-            Er is een fout opgetreden.
+                <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+            </div>
+
+            <div class="card-body">
+                <!-- LOGICA / VELDEN EXACT HETZELFDE ALS JOUW ORIGINEEL -->
+                <form th:action="@{/register}" method="post">
+                    <label>Gebruikersnaam</label>
+                    <input type="text" name="username" required>
+
+                    <label>E-mailadres</label>
+                    <input type="email" name="email" required>
+
+                    <label>Wachtwoord</label>
+                    <input type="password" name="password" required>
+
+                    <button class="btn" type="submit">Registreren</button>
+                </form>
+            </div>
         </div>
 
-        <form th:action="@{/register}" method="post">
-            <div class="field">
-                <label for="username">Gebruikersnaam</label>
-                <input id="username" type="text" name="username" required>
-            </div>
-
-            <div class="field">
-                <label for="email">E-mailadres</label>
-                <input id="email" type="email" name="email" required>
-            </div>
-
-            <div class="field">
-                <label for="password">Wachtwoord</label>
-                <input id="password" type="password" name="password" required>
-            </div>
-
-            <button type="submit" class="btn">Registreren</button>
-        </form>
-
-        <div class="extra">
-            <span>Heb je al een account?</span>
-            <a href="/login">Inloggen</a>
+        <div class="hint" style="margin-top:14px">
+            Al een account? <a href="/login">Inloggen</a>
         </div>
     </div>
+
 </div>
 
 </body>

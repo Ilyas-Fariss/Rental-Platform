@@ -1,324 +1,453 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org"
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Rental Platform</title>
+    <title>Dashboard – Rental Platform</title>
+
     <style>
-        :root {
-            --primary: #1e88e5;
-            --primary-dark: #1565c0;
-            --bg: #f3f4f7;
-            --nav-bg: #111827;
-            --card-bg: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
+
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
         }
 
-        * { box-sizing: border-box; }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
 
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: var(--bg);
-            color: var(--text-main);
+        /* ========== NAVBAR ========== */
+        nav{
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
         }
 
-        /* NAVBAR */
-
-        .navbar {
-            background: var(--nav-bg);
-            color: #ffffff;
-            padding: 12px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .nav-left,.nav-right{
+            display:flex;
+            align-items:center;
+            gap:18px;
         }
 
-        .nav-left, .nav-center, .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
+        nav a{
+            color:#E5E7EB;
+            font-weight:600;
+            font-size:14px;
+            transition:.2s;
+        }
+        nav a:hover{color:white;transform:translateY(-1px)}
+
+        .nav-cart{
+            position:relative;
+            width:36px;
+            height:36px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
+            transition:.2s;
+        }
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
+        }
+        .nav-cart svg{width:18px;height:18px;fill:white}
+
+        .cart-badge{
+            position:absolute;
+            top:-6px;
+            right:-8px;
+            background:var(--success);
+            color:white;
+            font-size:11px;
+            padding:2px 7px;
+            border-radius:999px;
+            font-weight:800;
+            border:2px solid var(--nav);
         }
 
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: #fff;
-            text-decoration: none;
-            position: relative;
+        nav form{display:inline}
+        nav button{
+            background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer;
+        }
+        nav button:hover{color:white}
+
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1300px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
         }
 
-        .brand svg { display: block; }
-
-        .cart-badge {
-            position: absolute;
-            top: -4px;
-            left: 18px;
-            background: #22c55e;
-            color: #fff;
-            padding: 1px 7px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 700;
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
         }
 
-        .nav-link {
-            color: #e5e7eb;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
+        /* ========== HERO ========== */
+        .hero{
+            border-radius:22px;
+            overflow:hidden;
+            position:relative;
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            box-shadow:0 18px 55px rgba(99,102,241,.25);
+            padding:26px;
+            color:white;
         }
 
-        .nav-link:hover { color: #ffffff; }
-
-        .nav-link-active {
-            color: #ffffff;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 2px;
+        .hero::after{
+            content:"";
+            position:absolute;
+            inset:-50%;
+            background:
+                    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 45%),
+                    radial-gradient(circle at 70% 20%, rgba(255,255,255,.16), transparent 48%),
+                    radial-gradient(circle at 60% 80%, rgba(255,255,255,.12), transparent 52%);
+            transform:rotate(10deg);
+            opacity:.9;
+            pointer-events:none;
         }
 
-        .icon-button {
-            border-radius: 999px;
-            border: 1px solid #374151;
-            background: #111827;
-            padding: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            text-decoration: none;
+        .hero-inner{
+            position:relative;
+            display:flex;
+            justify-content:space-between;
+            gap:18px;
+            align-items:flex-start;
+            flex-wrap:wrap;
         }
 
-        .icon-button svg { display: block; }
-
-        .icon-button:hover {
-            background: #1f2937;
+        .hero h1{
+            margin:0;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:-.02em;
         }
 
-        .btn {
-            border-radius: 999px;
-            border: none;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
+        .hero p{
+            margin:10px 0 0;
+            max-width:680px;
+            opacity:.92;
+            line-height:1.5;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
+        .hero-actions{
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:16px;
         }
 
-        .btn-primary:hover { background: var(--primary-dark); }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #4b5563;
-            color: #e5e7eb;
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            padding:12px 16px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
         }
 
-        .btn-outline:hover {
-            background: #1f2937;
+        .btn-primary{
+            background:rgba(255,255,255,.16);
+            border-color:rgba(255,255,255,.25);
+            color:white;
+        }
+        .btn-primary:hover{transform:translateY(-1px);background:rgba(255,255,255,.22)}
+
+        .btn-dark{
+            background:var(--nav);
+            color:white;
+        }
+        .btn-dark:hover{transform:translateY(-1px);filter:brightness(1.05)}
+
+        /* ========== SECTION ========== */
+        .section-title{
+            margin:22px 0 12px;
+            font-size:16px;
+            font-weight:900;
+            color:#0f172a;
         }
 
-        .nav-right form {
-            margin: 0;
+        /* ========== STATS ========== */
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:16px;
+        }
+        @media(max-width:980px){.stats{grid-template-columns:1fr}}
+
+        .stat{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:18px;
+            padding:18px;
+            box-shadow:0 14px 40px rgba(15,23,42,.08);
+            transition:.25s;
+            position:relative;
+            overflow:hidden;
+        }
+        .stat:hover{transform:translateY(-2px);box-shadow:0 22px 55px rgba(15,23,42,.12)}
+
+        .stat .label{
+            color:var(--text-muted);
+            font-size:12px;
+            font-weight:900;
+            letter-spacing:.05em;
+            text-transform:uppercase;
+        }
+        .stat .value{
+            margin-top:8px;
+            font-size:26px;
+            font-weight:900;
+        }
+        .stat .hint{
+            margin-top:10px;
+            color:var(--text-muted);
+            font-size:13px;
+            line-height:1.4;
         }
 
-        /* PAGE LAYOUT */
+        .stat-badge{
+            position:absolute;
+            top:14px;
+            right:14px;
+            width:40px;height:40px;
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#EEF2FF;
+            border:1px solid #E0E7FF;
+        }
+        .stat-badge svg{width:18px;height:18px;fill:var(--primary-dark)}
 
-        .page {
-            max-width: 1100px;
-            margin: 32px auto;
-            padding: 0 16px 40px;
+        /* ========== QUICK ACTIONS ========== */
+        .actions{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:16px;
+        }
+        @media(max-width:980px){.actions{grid-template-columns:1fr}}
+
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:20px;
+            padding:20px;
+            box-shadow:0 14px 40px rgba(15,23,42,.1);
+            transition:.25s;
+        }
+        .card:hover{transform:translateY(-3px);box-shadow:0 22px 55px rgba(15,23,42,.16)}
+
+        .card h3{
+            margin:0 0 6px;
+            font-size:16px;
+            font-weight:900;
+        }
+        .card p{
+            margin:0;
+            color:var(--text-muted);
+            line-height:1.5;
         }
 
-        .hero {
-            background: linear-gradient(135deg, #1e88e5, #3b82f6);
-            color: white;
-            padding: 32px 32px 28px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
-            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.35);
+        .card .go{
+            margin-top:14px;
+            display:inline-flex;
+            align-items:center;
+            gap:10px;
+            font-weight:900;
+            color:var(--primary-dark);
+            transition:.2s;
+        }
+        .card .go:hover{transform:translateY(-1px)}
+        .arrow{
+            width:18px;height:18px;border-radius:10px;
+            display:inline-flex;align-items:center;justify-content:center;
+            background:#EEF2FF;border:1px solid #E0E7FF;
+        }
+        .arrow svg{width:12px;height:12px;fill:var(--primary-dark)}
+
+        /* ========== FOOT NOTE ========== */
+        .note{
+            margin-top:18px;
+            background:rgba(15,23,42,.04);
+            border:1px solid rgba(15,23,42,.08);
+            border-radius:18px;
+            padding:16px;
+            color:#334155;
+            line-height:1.5;
         }
 
-        .hero h1 {
-            margin: 0 0 8px;
-            font-size: 32px;
-        }
-
-        .hero p {
-            margin: 0;
-            max-width: 520px;
-        }
-
-        .hero-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .quick-links {
-            margin-top: 28px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 18px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 14px;
-            padding: 18px 18px 20px;
-            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
-        }
-
-        .card h2 {
-            margin: 0 0 8px;
-            font-size: 19px;
-        }
-
-        .card p {
-            margin: 0 0 10px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .rules-list {
-            margin: 8px 0 0;
-            padding-left: 18px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .rules-list li { margin-bottom: 4px; }
-
-        @media (max-width: 720px) {
-            .navbar {
-                padding-inline: 16px;
-            }
-            .nav-center { display: none; }
-            .hero {
-                flex-direction: column;
-            }
-            .hero-actions {
-                align-items: flex-start;
-            }
-        }
+        .note strong{color:#0f172a}
     </style>
 </head>
+
 <body>
 
-<nav class="navbar">
+<nav>
     <div class="nav-left">
-        <a href="/cart" class="brand">
-            <!-- Cart logo linksboven -->
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24" width="26" height="26">
-                <path fill="#ffffff"
-                      d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9
-                         2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22
-                         17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.53c.75 0 1.4-.41
-                         1.74-1.03L21.8 8.48c.25-.46.08-1.05-.38-1.3
-                         -.14-.08-.3-.13-.46-.13H6.21L5.27 4.57C5.11 4.22
-                         4.76 4 4.38 4H2v2h1l3.6 7.59-1.35 2.44
-                         C4.52 16.37 5.48 18 7 18h12v-2H7.42l-.26-.5z"/>
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
             </svg>
-            <span>Rental Platform</span>
-
+            <!-- ✅ null-safe -->
             <span class="cart-badge"
                   th:if="${cartCount != null and cartCount > 0}"
-                  th:text="${cartCount}">1</span>
+                  th:text="${cartCount}">0</span>
         </a>
-    </div>
 
-    <div class="nav-center" sec:authorize="isAuthenticated()">
-        <a href="/dashboard" class="nav-link nav-link-active">Home</a>
-        <a href="/catalog" class="nav-link">Catalogus</a>
-        <a href="/orders" class="nav-link">Mijn reservaties</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders" sec:authorize="isAuthenticated()">Mijn reservaties</a>
     </div>
 
     <div class="nav-right">
-        <a href="/profile" class="icon-button" sec:authorize="isAuthenticated()">
-            <!-- User icon -->
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24" width="22" height="22">
-                <path fill="#e5e7eb"
-                      d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4
-                         -4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8
-                         1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
-        </a>
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
 
-        <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
-            <button type="submit" class="btn btn-outline">Uitloggen</button>
-        </form>
-
-        <a href="/login" class="btn btn-primary" sec:authorize="!isAuthenticated()">Inloggen</a>
-        <a href="/register" class="btn btn-outline" sec:authorize="!isAuthenticated()">Registreren</a>
+        <span sec:authorize="isAuthenticated()">
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
+            </form>
+        </span>
     </div>
 </nav>
 
 <div class="page">
-    <section class="hero">
-        <div>
-            <h1 th:text="'Welkom, ' + ${username} + '!'">Welkom, gebruiker!</h1>
-            <p>
-                Dit platform ondersteunt studenten bij het reserveren en huren van technisch materiaal
-                voor projecten, repetities en eindwerken. Beheer eenvoudig je materiaal, bekijk beschikbaarheid
-                en volg je reservaties op één centrale plaats.
-            </p>
+
+    <div class="hero">
+        <div class="hero-inner">
+            <div>
+                <h1>Welkom terug</h1>
+                <p>
+                    Reserveer materiaal voor je project in een paar klikken.
+                    Kies je items, selecteer per item een einddatum en bevestig je reservatie.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="/catalog" class="btn btn-primary">Materiaal bekijken</a>
+                    <a href="/cart" class="btn btn-dark">Naar mandje</a>
+                </div>
+            </div>
+
+            <div style="min-width:260px;max-width:320px">
+                <div style="opacity:.95;font-weight:900;margin-bottom:8px">Ingelogd als</div>
+                <div style="font-size:18px;font-weight:900" sec:authentication="name">student</div>
+                <div style="margin-top:10px;opacity:.85;line-height:1.45;font-size:13px">
+                    Tip: kies je einddatum in het mandje.
+                    De prijs wordt automatisch berekend op basis van dagen.
+                </div>
+            </div>
         </div>
-        <div class="hero-actions">
-            <a href="/catalog" class="btn btn-primary">Naar de catalogus</a>
-            <a href="/orders" class="btn btn-outline" sec:authorize="isAuthenticated()">Mijn reservaties</a>
+    </div>
+
+    <div class="section-title">Overzicht</div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-badge">
+                <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/></svg>
+            </div>
+            <div class="label">Items in mandje</div>
+            <div class="value" th:text="${cartCount != null ? cartCount : 0}">0</div>
+            <div class="hint">Beheer je items en kies per item een einddatum.</div>
         </div>
-    </section>
 
-    <section class="quick-links">
-        <article class="card">
-            <h2>Hoe werkt het?</h2>
-            <p>
-                Kies materiaal uit de catalogus, plaats het in je mandje en rond de reservatie af via de checkout.
-                Na bevestiging krijg je een overzicht van je reservatie.
-            </p>
-            <ul class="rules-list">
-                <li>Controleer altijd of je de juiste periode selecteert.</li>
-                <li>Reserveer enkel materiaal dat je effectief nodig hebt.</li>
-                <li>Annuleer tijdig wanneer je plannen wijzigen.</li>
-            </ul>
-        </article>
+        <div class="stat">
+            <div class="stat-badge">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V5h14v14ZM7 7h10v2H7V7Zm0 4h10v2H7v-2Zm0 4h6v2H7v-2Z"/></svg>
+            </div>
+            <div class="label">Reservaties</div>
+            <!-- ✅ dynamisch -->
+            <div class="value" th:text="${ordersCount != null ? ordersCount : 0}">0</div>
+            <div class="hint">Bekijk je historiek en details per reservatie.</div>
+        </div>
 
-        <article class="card">
-            <h2>Spelregels materiaal</h2>
-            <p>
-                Om alles vlot te laten verlopen, vragen we om onderstaande afspraken te respecteren.
-            </p>
-            <ul class="rules-list">
-                <li>Ga zorgvuldig om met alle toestellen en accessoires.</li>
-                <li>Breng materiaal op tijd en in dezelfde staat terug.</li>
-                <li>Rapporteer schade of defecten onmiddellijk aan de verantwoordelijke.</li>
-            </ul>
-        </article>
+        <div class="stat">
+            <div class="stat-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5Z"/></svg>
+            </div>
+            <div class="label">Tip</div>
+            <div class="value">Snel</div>
+            <div class="hint">Gebruik search + categorie om snel het juiste materiaal te vinden.</div>
+        </div>
+    </div>
 
-        <article class="card">
-            <h2>Snel naar</h2>
-            <p>
-                Handige shortcuts om meteen aan de slag te gaan met je volgende project.
-            </p>
-            <ul class="rules-list">
-                <li><a href="/catalog" class="nav-link" style="padding:0;">Bekijk de volledige catalogus</a></li>
-                <li><a href="/cart" class="nav-link" style="padding:0;">Ga naar je winkelmand</a></li>
-                <li><a href="/profile" class="nav-link" style="padding:0;">Werk je profielgegevens bij</a></li>
-            </ul>
-        </article>
-    </section>
+    <div class="section-title">Snelle acties</div>
+
+    <div class="actions">
+        <div class="card">
+            <h3>Materiaal kiezen</h3>
+            <p>Zoek in de catalogus en voeg items toe aan je mandje.</p>
+            <a class="go" href="/catalog">
+                <span class="arrow"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg></span>
+                Naar catalogus
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>Mandje beheren</h3>
+            <p>Kies per item een einddatum. De prijs wordt automatisch berekend.</p>
+            <a class="go" href="/cart">
+                <span class="arrow"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg></span>
+                Naar mandje
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>Reservaties bekijken</h3>
+            <p>Bekijk je reservaties en open details per reservatie.</p>
+            <a class="go" href="/orders">
+                <span class="arrow"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg></span>
+                Naar reservaties
+            </a>
+        </div>
+    </div>
+
+    <div class="note">
+        <strong>Hoe werkt de prijsberekening?</strong><br>
+        Je kiest per item een einddatum. Daarna wordt de prijs berekend als:
+        <strong>prijs per dag × aantal × aantal dagen</strong>.
+    </div>
+
 </div>
 
 </body>

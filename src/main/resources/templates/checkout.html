@@ -1,302 +1,337 @@
 <!DOCTYPE html>
-<html lang="nl" xmlns:th="http://www.thymeleaf.org">
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>Checkout - Rental Platform</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <title>Checkout – Rental Platform</title>
 
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f3f4f6;
-            margin: 0;
-            padding: 0;
+        /* ========== DESIGN SYSTEM ========== */
+        :root{
+            --primary:#6366F1;
+            --primary-dark:#4F46E5;
+            --success:#22C55E;
+            --danger:#EF4444;
+
+            --bg:#F4F6F8;
+            --surface:#FFFFFF;
+            --border:#E5E7EB;
+
+            --text:#111827;
+            --text-muted:#64748B;
+
+            --nav:#0F172A;
         }
 
-        .page-container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 16px;
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family:'Inter','Segoe UI',system-ui,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+        a{text-decoration:none;color:inherit}
+
+        /* ========== NAVBAR ========== */
+        nav{
+            background:var(--nav);
+            color:white;
+            padding:14px 28px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            box-shadow:0 8px 30px rgba(15,23,42,.6);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+        .nav-left,.nav-right{display:flex;align-items:center;gap:18px}
+        nav a{color:#E5E7EB;font-weight:600;font-size:14px;transition:.2s}
+        nav a:hover{color:white;transform:translateY(-1px)}
+        nav form{display:inline}
+        nav button{background:none;border:none;color:#E5E7EB;font-weight:600;cursor:pointer}
+        nav button:hover{color:white}
+
+        .nav-cart{
+            position:relative;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:12px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);
+            transition:.2s;
+        }
+        .nav-cart:hover{
+            background:rgba(99,102,241,.25);
+            border-color:var(--primary);
+            transform:translateY(-1px);
+        }
+        .nav-cart svg{width:18px;height:18px;fill:white}
+        .cart-badge{
+            position:absolute;top:-6px;right:-8px;
+            background:var(--success);color:white;
+            font-size:11px;padding:2px 7px;border-radius:999px;
+            font-weight:800;border:2px solid var(--nav);
         }
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 4px;
+        /* ========== PAGE ========== */
+        .page{
+            width:95%;
+            max-width:1050px;
+            margin:32px auto;
+            animation:fadeUp .45s ease-out;
+        }
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(12px)}
+            to{opacity:1;transform:translateY(0)}
         }
 
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 24px;
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
         }
 
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
+        h1{
+            margin:0;
+            font-size:30px;
+            font-weight:900;
+            letter-spacing:-.02em;
+        }
+        .subtitle{color:var(--text-muted);margin-top:6px;line-height:1.5}
+
+        .pill{
+            display:inline-block;
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:.04em;
+            padding:6px 10px;
+            border-radius:999px;
+            background:#EEF2FF;
+            border:1px solid #E0E7FF;
+            color:var(--primary-dark);
         }
 
-        .alert-error {
-            background: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
+        /* ========== CARD ========== */
+        .card{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:22px;
+            box-shadow:0 14px 40px rgba(15,23,42,.10);
+            overflow:hidden;
+        }
+        .card-head{
+            padding:16px 18px;
+            border-bottom:1px solid #EEF2F7;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .card-head strong{font-size:14px}
+        .card-body{padding:16px 18px}
+
+        /* ========== ROWS ========== */
+        .row{
+            display:flex;
+            justify-content:space-between;
+            gap:14px;
+            padding:14px 0;
+            border-bottom:1px solid #EEF2F7;
+        }
+        .row:last-child{border-bottom:none}
+
+        .left .name{
+            font-weight:900;
+            font-size:15px;
+        }
+        .left .meta{
+            margin-top:6px;
+            color:var(--text-muted);
+            font-size:12px;
+            line-height:1.45;
+        }
+        .price{
+            font-weight:900;
+            white-space:nowrap;
         }
 
-        .alert-success {
-            background: #dcfce7;
-            border: 1px solid #bbf7d0;
-            color: #166534;
+        /* ========== TOTAL ========== */
+        .totalbox{
+            margin-top:14px;
+            padding:16px;
+            border-radius:18px;
+            background:rgba(99,102,241,.08);
+            border:1px solid rgba(99,102,241,.18);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .totalbox .label{
+            color:var(--text-muted);
+            font-weight:900;
+            letter-spacing:.03em;
+        }
+        .totalbox .big{
+            font-size:22px;
+            font-weight:900;
         }
 
-        .checkout-layout {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
+        /* ========== BUTTONS ========== */
+        .actions{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-top:14px;
+        }
+        @media(max-width:760px){.actions{grid-template-columns:1fr}}
+
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:12px 14px;
+            border-radius:14px;
+            font-weight:900;
+            cursor:pointer;
+            transition:.2s;
+            border:1px solid transparent;
+            user-select:none;
         }
 
-        @media (max-width: 900px) {
-            .checkout-layout {
-                grid-template-columns: 1fr;
-            }
+        .btn-primary{
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white;
         }
+        .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
 
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px 22px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        .btn-secondary{
+            background:#E5E7EB;
+            color:#111827;
         }
+        .btn-secondary:hover{background:#D1D5DB}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
+        /* ========== INFO STRIP ========== */
+        .info{
+            margin-top:14px;
+            padding:14px 16px;
+            border-radius:18px;
+            background:rgba(15,23,42,.04);
+            border:1px solid rgba(15,23,42,.08);
+            color:#334155;
+            line-height:1.5;
+            font-size:13px;
         }
-
-        th, td {
-            padding: 10px 8px;
-            text-align: left;
-        }
-
-        thead th {
-            border-bottom: 1px solid #e5e7eb;
-            font-weight: 600;
-            color: #6b7280;
-        }
-
-        tbody tr + tr {
-            border-top: 1px solid #f3f4f6;
-        }
-
-        .product-name {
-            font-weight: 600;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-
-        .qty {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .price {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 14px;
-        }
-
-        .summary-row.total {
-            font-weight: 700;
-            font-size: 16px;
-            margin-top: 12px;
-        }
-
-        .summary-label {
-            color: #6b7280;
-        }
-
-        .summary-value {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .btn-primary,
-        .btn-secondary,
-        .btn-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            border-radius: 999px;
-            padding: 9px 18px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.35);
-        }
-
-        .btn-secondary {
-            background: white;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #f9fafb;
-        }
-
-        .btn-link {
-            background: transparent;
-            color: #6b7280;
-            padding-left: 0;
-        }
-
-        .btn-link:hover {
-            color: #111827;
-        }
-
-        .summary-actions {
-            margin-top: 18px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 12px;
-            color: #6b7280;
-        }
-
-        .empty-state h2 {
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        .empty-state p {
-            margin-bottom: 16px;
-            font-size: 14px;
-        }
+        .info strong{color:#0f172a}
     </style>
 </head>
+
 <body>
-<div class="page-container">
-    <h1>Checkout</h1>
-    <p class="subtitle">Controleer hieronder je reservatie voordat je definitief bevestigt.</p>
 
-    <!-- Foutmelding -->
-    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-    <!-- Eventuele success-melding via redirectAttributes -->
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+<nav>
+    <div class="nav-left">
+        <!-- CART FIRST -->
+        <a href="/cart" class="nav-cart" aria-label="Winkelmandje">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2Zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2ZM7.17 14h9.66c.75 0 1.4-.41 1.74-1.03l3.24-5.88a1 1 0 0 0-.88-1.48H6.21L5.27 2H2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 8 16h12v-2H8l1.17-2Z"/>
+            </svg>
+            <span class="cart-badge" th:if="${cartCount>0}" th:text="${cartCount}">0</span>
+        </a>
 
-    <div class="checkout-layout">
-        <!-- Linkerkant: overzicht items -->
-        <div class="card">
-            <h2 style="margin-top: 0; margin-bottom: 16px; font-size: 18px;">Geselecteerde materialen</h2>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/catalog">Catalogus</a>
+        <a href="/orders">Mijn reservaties</a>
+    </div>
 
-            <div th:if="${#lists.isEmpty(items)}" class="empty-state">
-                <h2>Je winkelmandje is leeg</h2>
-                <p>Keer terug naar de catalogus om materiaal te kiezen voor je project.</p>
-                <a th:href="@{/catalog}" class="btn-secondary">Naar catalogus</a>
-            </div>
+    <div class="nav-right">
+        <span sec:authorize="!isAuthenticated()">
+            <a href="/login">Inloggen</a>
+            <a href="/register">Registreren</a>
+        </span>
+        <span sec:authorize="isAuthenticated()">
+            <a href="/profile">Profiel</a> |
+            <form th:action="@{/logout}" method="post">
+                <button type="submit">Uitloggen</button>
+            </form>
+        </span>
+    </div>
+</nav>
 
-            <div th:if="${!#lists.isEmpty(items)}">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Aantal</th>
-                        <th>Prijs per dag</th>
-                        <th>Totaal</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="item : ${items}">
-                        <td>
-                            <div class="product-name" th:text="${item.product.name}"></div>
-                            <div class="tag" th:text="${item.product.category.name}">Categorie</div>
-                        </td>
-                        <td class="qty" th:text="${item.quantity}">1</td>
-                        <td class="price"
-                            th:text="${#numbers.formatDecimal(item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
-                            0,00 €
-                        </td>
-                        <td class="price"
-                            th:text="${#numbers.formatDecimal(item.quantity * item.product.dailyPrice, 1, 'COMMA', 2, 'POINT')} + ' €'">
-                            0,00 €
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+<div class="page">
+
+    <div class="topbar">
+        <div>
+            <h1>Checkout</h1>
+            <div class="subtitle">
+                Controleer je items en einddatums. Daarna kan je je reservatie bevestigen.
             </div>
         </div>
+        <span class="pill" th:text="${#lists.size(items)} + ' item(s)'">0 item(s)</span>
+    </div>
 
-        <!-- Rechterkant: samenvatting + knop bevestigen -->
-        <div class="card">
-            <h2 style="margin-top: 0; margin-bottom: 16px; font-size: 18px;">Samenvatting</h2>
+    <div class="card">
+        <div class="card-head">
+            <strong>Overzicht</strong>
+            <span class="pill">prijs/dag × aantal × dagen</span>
+        </div>
 
-            <div th:if="${#lists.isEmpty(items)}">
-                <p style="color:#6b7280; font-size:14px;">
-                    Er staan momenteel geen items in je mandje.
-                </p>
-            </div>
+        <div class="card-body">
 
-            <div th:if="${!#lists.isEmpty(items)}">
-                <div class="summary-row">
-                    <div class="summary-label">Aantal verschillende items</div>
-                    <div class="summary-value" th:text="${#lists.size(items)} + ' producten'">0 producten</div>
-                </div>
-
-                <div class="summary-row total">
-                    <div class="summary-label">Totale dagprijs</div>
-                    <div class="summary-value"
-                         th:text="${#numbers.formatDecimal(totalPrice, 1, 'COMMA', 2, 'POINT')} + ' € / dag'">
-                        0,00 € / dag
+            <div class="row" th:each="item : ${items}">
+                <div class="left">
+                    <div class="name" th:text="${item.product.name}">Product</div>
+                    <div class="meta">
+                        Aantal: <strong th:text="${item.quantity}">1</strong>
+                        • Lenen tot: <strong th:text="${item.endDate}">2025-12-18</strong>
+                        • Dagen: <strong th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1}">1</strong>
                     </div>
                 </div>
 
-                <div class="summary-actions">
-                    <form th:action="@{/cart/checkout/confirm}" method="post">
-                        <button type="submit" class="btn-primary">
-                            Reservatie definitief bevestigen
-                        </button>
-                    </form>
-
-                    <a th:href="@{/cart}" class="btn-secondary">Terug naar winkelmandje</a>
-
-                    <a th:href="@{/catalog}" class="btn-link">Verder winkelen</a>
+                <div class="price"
+                     th:text="${#numbers.formatDecimal(
+                        item.product.dailyPrice * item.quantity *
+                        (T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1),
+                        1,'COMMA',2,'POINT')} + ' €'">
+                    0,00 €
                 </div>
-
-                <p style="margin-top: 20px; font-size: 12px; color: #6b7280;">
-                    Opmerking: prijzen zijn per dag huur. In deze proof-of-concept wordt nog geen effectieve
-                    betaalmethode geïntegreerd, enkel de reservatie van materiaal.
-                </p>
             </div>
+
+            <div class="totalbox">
+                <div>
+                    <div class="label">Totaal te betalen</div>
+                    <div class="info" style="margin:10px 0 0">
+                        Als je een einddatum wil aanpassen, ga terug naar je mandje.
+                    </div>
+                </div>
+                <div class="big" th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'">0,00 €</div>
+            </div>
+
+            <div class="actions">
+                <a href="/cart" class="btn btn-secondary">Terug naar mandje</a>
+
+                <form th:action="@{/orders/confirm}" method="get" style="margin:0">
+                    <button class="btn btn-primary" type="submit">Reservatie bevestigen</button>
+                </form>
+            </div>
+
         </div>
     </div>
+
+    <div class="info">
+        <strong>Bevestiging:</strong> na bevestigen wordt je reservatie opgeslagen en zichtbaar onder “Mijn reservaties”.
+    </div>
+
 </div>
+
 </body>
 </html>

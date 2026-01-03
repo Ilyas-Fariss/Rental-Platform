@@ -2,10 +2,9 @@
 <html lang="nl"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
-    <title>Checkout – Rental Platform</title>
+    <title>Profiel – Rental Platform</title>
 
     <style>
         /* ========== DESIGN SYSTEM ========== */
@@ -79,7 +78,7 @@
         /* ========== PAGE ========== */
         .page{
             width:95%;
-            max-width:1050px;
+            max-width:1100px;
             margin:32px auto;
             animation:fadeUp .45s ease-out;
         }
@@ -88,36 +87,72 @@
             to{opacity:1;transform:translateY(0)}
         }
 
-        .topbar{
+        /* ========== HERO ========== */
+        .hero{
+            border-radius:24px;
+            overflow:hidden;
+            position:relative;
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            box-shadow:0 18px 55px rgba(99,102,241,.25);
+            padding:26px;
+            color:white;
+        }
+        .hero::after{
+            content:"";
+            position:absolute;
+            inset:-50%;
+            background:
+                    radial-gradient(circle at 20% 30%, rgba(255,255,255,.22), transparent 45%),
+                    radial-gradient(circle at 70% 20%, rgba(255,255,255,.16), transparent 48%),
+                    radial-gradient(circle at 60% 80%, rgba(255,255,255,.12), transparent 52%);
+            transform:rotate(10deg);
+            opacity:.9;
+            pointer-events:none;
+        }
+        .hero-inner{
+            position:relative;
             display:flex;
             justify-content:space-between;
-            align-items:flex-end;
-            gap:12px;
+            gap:18px;
+            align-items:flex-start;
             flex-wrap:wrap;
-            margin-bottom:18px;
         }
-
-        h1{
+        .hero h1{
             margin:0;
             font-size:30px;
             font-weight:900;
             letter-spacing:-.02em;
         }
-        .subtitle{color:var(--text-muted);margin-top:6px;line-height:1.5}
-
-        .pill{
-            display:inline-block;
-            font-size:11px;
-            font-weight:900;
-            letter-spacing:.04em;
-            padding:6px 10px;
-            border-radius:999px;
-            background:#EEF2FF;
-            border:1px solid #E0E7FF;
-            color:var(--primary-dark);
+        .hero p{
+            margin:10px 0 0;
+            opacity:.92;
+            line-height:1.5;
+            max-width:650px;
         }
 
-        /* ========== CARD ========== */
+        .avatar{
+            width:60px;height:60px;
+            border-radius:18px;
+            background:rgba(255,255,255,.16);
+            border:1px solid rgba(255,255,255,.25);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:900;
+            font-size:18px;
+        }
+
+        /* ========== GRID ========== */
+        .grid{
+            display:grid;
+            grid-template-columns:1.6fr 1fr;
+            gap:18px;
+            margin-top:18px;
+            align-items:start;
+        }
+        @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+
+        /* ========== CARDS ========== */
         .card{
             background:var(--surface);
             border:1px solid var(--border);
@@ -137,62 +172,58 @@
         .card-head strong{font-size:14px}
         .card-body{padding:16px 18px}
 
-        /* ========== ROWS ========== */
-        .row{
-            display:flex;
-            justify-content:space-between;
-            gap:14px;
-            padding:14px 0;
+        .field{
+            padding:12px 0;
             border-bottom:1px solid #EEF2F7;
         }
-        .row:last-child{border-bottom:none}
-
-        .left .name{
-            font-weight:900;
-            font-size:15px;
-        }
-        .left .meta{
-            margin-top:6px;
-            color:var(--text-muted);
+        .field:last-child{border-bottom:none}
+        .label{
             font-size:12px;
-            line-height:1.45;
-        }
-        .price{
             font-weight:900;
-            white-space:nowrap;
-        }
-
-        /* ========== TOTAL ========== */
-        .totalbox{
-            margin-top:14px;
-            padding:16px;
-            border-radius:18px;
-            background:rgba(99,102,241,.08);
-            border:1px solid rgba(99,102,241,.18);
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:12px;
-            flex-wrap:wrap;
-        }
-        .totalbox .label{
             color:var(--text-muted);
-            font-weight:900;
-            letter-spacing:.03em;
+            letter-spacing:.05em;
+            text-transform:uppercase;
         }
-        .totalbox .big{
-            font-size:22px;
+        .value{
+            margin-top:6px;
             font-weight:900;
+            font-size:16px;
+        }
+        .muted{
+            color:var(--text-muted);
+            font-size:13px;
+            line-height:1.5;
         }
 
-        /* ========== BUTTONS ========== */
+        /* ========== QUICK ACTIONS ========== */
         .actions{
-            display:grid;
-            grid-template-columns:1fr 1fr;
+            display:flex;
+            flex-direction:column;
             gap:12px;
-            margin-top:14px;
         }
-        @media(max-width:760px){.actions{grid-template-columns:1fr}}
+        .action{
+            padding:16px;
+            border-radius:20px;
+            border:1px solid var(--border);
+            background:#fff;
+            box-shadow:0 14px 40px rgba(15,23,42,.08);
+            transition:.25s;
+        }
+        .action:hover{
+            transform:translateY(-2px);
+            box-shadow:0 22px 55px rgba(15,23,42,.12);
+        }
+        .action h3{
+            margin:0 0 6px;
+            font-size:15px;
+            font-weight:900;
+        }
+        .action p{
+            margin:0;
+            color:var(--text-muted);
+            line-height:1.5;
+            font-size:13px;
+        }
 
         .btn{
             display:inline-flex;
@@ -208,31 +239,16 @@
             border:1px solid transparent;
             user-select:none;
         }
-
         .btn-primary{
             background:linear-gradient(135deg,var(--primary),var(--primary-dark));
             color:white;
         }
         .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
-
         .btn-secondary{
             background:#E5E7EB;
             color:#111827;
         }
         .btn-secondary:hover{background:#D1D5DB}
-
-        /* ========== INFO STRIP ========== */
-        .info{
-            margin-top:14px;
-            padding:14px 16px;
-            border-radius:18px;
-            background:rgba(15,23,42,.04);
-            border:1px solid rgba(15,23,42,.08);
-            color:#334155;
-            line-height:1.5;
-            font-size:13px;
-        }
-        .info strong{color:#0f172a}
     </style>
 </head>
 
@@ -269,66 +285,76 @@
 
 <div class="page">
 
-    <div class="topbar">
-        <div>
-            <h1>Checkout</h1>
-            <div class="subtitle">
-                Controleer je items en einddatums. Daarna kan je je reservatie bevestigen.
-            </div>
-        </div>
-        <span class="pill" th:text="${#lists.size(items)} + ' item(s)'">0 item(s)</span>
-    </div>
-
-    <div class="card">
-        <div class="card-head">
-            <strong>Overzicht</strong>
-            <span class="pill">prijs/dag × aantal × dagen</span>
-        </div>
-
-        <div class="card-body">
-
-            <div class="row" th:each="item : ${items}">
-                <div class="left">
-                    <div class="name" th:text="${item.product.name}">Product</div>
-                    <div class="meta">
-                        Aantal: <strong th:text="${item.quantity}">1</strong>
-                        • Lenen tot: <strong th:text="${item.endDate}">2025-12-18</strong>
-                        • Dagen: <strong th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1}">1</strong>
-                    </div>
-                </div>
-
-                <div class="price"
-                     th:text="${#numbers.formatDecimal(
-                        item.product.dailyPrice * item.quantity *
-                        (T(java.time.temporal.ChronoUnit).DAYS.between(today, item.endDate) + 1),
-                        1,'COMMA',2,'POINT')} + ' €'">
-                    0,00 €
-                </div>
+    <div class="hero">
+        <div class="hero-inner">
+            <div>
+                <h1>Profiel</h1>
+                <p>
+                    Hier vind je je accountinformatie en snelle acties om je reservaties te beheren.
+                </p>
             </div>
 
-            <div class="totalbox">
+            <div style="display:flex;gap:12px;align-items:center">
+                <div class="avatar" aria-label="Avatar">
+                    <span th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">A</span>
+                </div>
                 <div>
-                    <div class="label">Totaal te betalen</div>
-                    <div class="info" style="margin:10px 0 0">
-                        Als je een einddatum wil aanpassen, ga terug naar je mandje.
-                    </div>
+                    <div style="opacity:.9;font-weight:900">Ingelogd als</div>
+                    <div style="font-size:16px;font-weight:900" sec:authentication="name">student</div>
                 </div>
-                <div class="big" th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')} + ' €'">0,00 €</div>
             </div>
-
-            <div class="actions">
-                <a href="/cart" class="btn btn-secondary">Terug naar mandje</a>
-
-                <form th:action="@{/orders/confirm}" method="get" style="margin:0">
-                    <button class="btn btn-primary" type="submit">Reservatie bevestigen</button>
-                </form>
-            </div>
-
         </div>
     </div>
 
-    <div class="info">
-        <strong>Bevestiging:</strong> na bevestigen wordt je reservatie opgeslagen en zichtbaar onder “Mijn reservaties”.
+    <div class="grid">
+
+        <!-- ACCOUNT INFO -->
+        <div class="card">
+            <div class="card-head">
+                <strong>Accountgegevens</strong>
+                <span class="pill">Student</span>
+            </div>
+
+            <div class="card-body">
+                <div class="field">
+                    <div class="label">Gebruikersnaam</div>
+                    <div class="value" sec:authentication="name">student</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Status</div>
+                    <div class="value">Actief</div>
+                    <div class="muted" style="margin-top:6px">
+                        Je kan materiaal reserveren via de catalogus en je mandje.
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+                    <a href="/catalog" class="btn btn-secondary">Catalogus</a>
+                    <a href="/orders" class="btn btn-primary">Mijn reservaties</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="actions">
+            <div class="action">
+                <h3>Nieuwe reservatie</h3>
+                <p>Zoek materiaal en voeg het toe aan je mandje.</p>
+                <div style="margin-top:12px">
+                    <a href="/catalog" class="btn btn-primary">Materiaal bekijken</a>
+                </div>
+            </div>
+
+            <div class="action">
+                <h3>Mandje beheren</h3>
+                <p>Kies per item een einddatum. De prijs wordt automatisch berekend.</p>
+                <div style="margin-top:12px">
+                    <a href="/cart" class="btn btn-secondary">Naar mandje</a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>

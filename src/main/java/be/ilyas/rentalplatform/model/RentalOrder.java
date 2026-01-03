@@ -2,6 +2,7 @@ package be.ilyas.rentalplatform.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,62 +21,37 @@ public class RentalOrder {
     @ManyToOne
     private AppUser user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
 
     public RentalOrder() {}
 
     // GETTERS
+    public Long getId() { return id; }
 
-    public Long getId() {
-        return id;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public double getTotalPrice() { return totalPrice; }
 
-    public double getTotalPrice() {
-        return totalPrice;
-    }
+    public int getTotalItems() { return totalItems; }
 
-    public int getTotalItems() {
-        return totalItems;
-    }
+    public AppUser getUser() { return user; }
 
-    public AppUser getUser() {
-        return user;
-    }
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
+    public List<OrderItem> getItems() { return items; }
 
     // SETTERS
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUser(AppUser user) {
-        this.user = user;
-    }
+    public void setUser(AppUser user) { this.user = user; }
 
     public void setItems(List<OrderItem> items) {
-        this.items = items;
-
-        if (items != null) {
-            for (OrderItem oi : items) {
-                oi.setOrder(this);
-            }
+        this.items = (items == null) ? new ArrayList<>() : items;
+        for (OrderItem oi : this.items) {
+            oi.setOrder(this);
         }
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
+    public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
 
-    public void setTotalItems(int totalItems) {
-        this.totalItems = totalItems;
-    }
+    public void setTotalItems(int totalItems) { this.totalItems = totalItems; }
 }
