@@ -34,17 +34,19 @@ public class CatalogController {
         List<Category> categories = categoryRepository.findAll();
         List<Product> products;
 
+        // ✅ Altijd teruggeven aan de view
+        model.addAttribute("selectedCategoryId", categoryId);
+        model.addAttribute("search", search);
+
         if (categoryId != null) {
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
             if (categoryOpt.isPresent()) {
                 products = productRepository.findByCategory(categoryOpt.get());
-                model.addAttribute("selectedCategoryId", categoryId);
             } else {
                 products = productRepository.findAll();
             }
         } else if (search != null && !search.isBlank()) {
             products = productRepository.findByNameContainingIgnoreCase(search);
-            model.addAttribute("search", search);
         } else {
             products = productRepository.findAll();
         }
@@ -53,5 +55,4 @@ public class CatalogController {
         model.addAttribute("products", products);
 
         return "catalog";
-    }
-}
+    }}

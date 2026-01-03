@@ -324,13 +324,17 @@
         <div class="filter-group">
             <label>Categorie</label>
             <select name="categoryId">
-                <option value="">Alle categorieën</option>
+                <option value="" th:selected="${selectedCategoryId == null}">
+                    Alle categorieën
+                </option>
+
                 <option th:each="c : ${categories}"
                         th:value="${c.id}"
                         th:text="${c.name}"
-                        th:selected="${categoryId != null and c.id == categoryId}">
+                        th:selected="${selectedCategoryId != null and c.id == selectedCategoryId}">
                 </option>
             </select>
+
         </div>
 
         <div class="filter-group">
