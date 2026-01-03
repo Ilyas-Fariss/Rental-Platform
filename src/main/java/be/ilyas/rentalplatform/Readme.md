@@ -210,7 +210,38 @@ De applicatie maakt gebruik van **Spring Security** voor authenticatie en autori
 Open het project in je IDE en voer het volgende commando uit:
 mvn spring-boot:run
 
+## Bronnen
 
+- Java Brains – Spring Security Authentication & Authorization  
+  https://www.youtube.com/watch?v=PhG5p_yv0zs
+- Amigoscode – Spring Boot Security Full Course  
+https://www.youtube.com/watch?v=her_7pa0vrg
+- Spring Boot Documentation: https://spring.io/projects/spring-boot
+- Spring Security Reference: https://spring.io/projects/spring-security
+- Thymeleaf Documentation: https://www.thymeleaf.org/documentation.html
+- H2 Database Documentation: https://www.h2database.com
+
+## Gebruik van AI-tools
+
+Tijdens de ontwikkeling van dit project werd gebruikgemaakt van AI-ondersteuning in de vorm van **GitHub Copilot**.
+
+GitHub Copilot werd ingezet als:
+- hulpmiddel voor code-suggesties in de IDE
+- ondersteuning bij het schrijven van standaardstructuren (controllers, services, repositories)
+- hulp bij het begrijpen en verbeteren van bestaande code
+- Troubleshooting van runtime errors (zoals 500 Internal Server Errors)
+- Verbeteren van error handling (null-checks, validaties en veilige fallbacks)
+- verfijnen van service- en controllerlogica
+
+GitHub Copilot werkt contextueel binnen de code-editor en maakt **geen gebruik van een afzonderlijke chatinterface**.  
+Hierdoor is het **niet mogelijk om een exporteerbare chatgeschiedenis of exacte prompts te delen**.
+
+Alle gegenereerde suggesties werden steeds:
+- kritisch geëvalueerd
+- aangepast waar nodig
+- volledig begrepen en geïntegreerd door de student zelf
+
+De uiteindelijke implementatie, structuur en logica van het project zijn mijn eigen keuzes en verantwoordelijkheid.
 
 ## 🧪 Database (H2)
 
