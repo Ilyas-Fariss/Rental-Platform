@@ -6,15 +6,15 @@ import be.ilyas.rentalplatform.model.Product;
 import be.ilyas.rentalplatform.repository.CartItemRepository;
 import be.ilyas.rentalplatform.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
+@Transactional
 public class CartService {
 
     private final CartItemRepository cartItemRepo;
@@ -52,17 +52,15 @@ public class CartService {
         return userOpt.orElse(null);
     }
 
-
-    public java.util.List<CartItem> getAllItems(jakarta.servlet.http.HttpSession session) {
+    public List<CartItem> getAllItems(HttpSession session) {
         AppUser user = getCurrentUserOrNull();
-        if (user == null) return java.util.List.of();
+        if (user == null) return List.of();
         return cartItemRepo.findByUser(user);
     }
 
-
-
     public void addToCart(Product product, HttpSession session) {
         AppUser user = getCurrentUserOrNull();
+        if (user == null || product == null) return;
 
         CartItem item = cartItemRepo.findByUserAndProduct(user, product).orElse(null);
 
@@ -77,11 +75,14 @@ public class CartService {
 
     public void removeFromCart(Long productId, HttpSession session) {
         AppUser user = getCurrentUserOrNull();
+        if (user == null || productId == null) return;
+
         cartItemRepo.deleteByUserAndProduct_Id(user, productId);
     }
 
     public void updateEndDate(Long productId, LocalDate endDate, HttpSession session) {
         AppUser user = getCurrentUserOrNull();
+        if (user == null || productId == null) return;
 
         List<CartItem> items = cartItemRepo.findByUser(user);
         for (CartItem item : items) {
@@ -101,7 +102,7 @@ public class CartService {
         return Math.max(days, 1);
     }
 
-    public double calculateTotal(jakarta.servlet.http.HttpSession session) {
+    public double calculateTotal(HttpSession session) {
         AppUser user = getCurrentUserOrNull();
         if (user == null) return 0.0;
 
@@ -115,8 +116,7 @@ public class CartService {
         return total;
     }
 
-
-    public int getCartCount(jakarta.servlet.http.HttpSession session) {
+    public int getCartCount(HttpSession session) {
         AppUser user = getCurrentUserOrNull();
         if (user == null) return 0;
 
@@ -126,9 +126,10 @@ public class CartService {
                 .sum();
     }
 
-
     public void clearCart(HttpSession session) {
         AppUser user = getCurrentUserOrNull();
+        if (user == null) return;
+
         cartItemRepo.deleteByUser(user);
     }
 }

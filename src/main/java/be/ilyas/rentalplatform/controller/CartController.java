@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import java.time.LocalDate;
 
@@ -31,13 +34,31 @@ public class CartController {
     }
 
     @GetMapping("/add/{id}")
-    public String addToCart(@PathVariable Long id, HttpSession session) {
+    public String addToCart(@PathVariable Long id,
+                            HttpSession session,
+                            HttpServletRequest request,
+                            RedirectAttributes redirectAttributes) {
+
         Product product = productRepo.findById(id).orElse(null);
         if (product != null) {
             cartService.addToCart(product, session);
+
+            // Flash message voor groene toast op catalogus
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Toegevoegd aan mandje: " + product.getName()
+            );
         }
-        return "redirect:/cart";
+
+        // Terug naar waar de user vandaan kwam (catalogus met filters/search)
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isBlank()) {
+            return "redirect:" + referer;
+        }
+
+        return "redirect:/catalog";
     }
+
 
     @GetMapping("/remove/{id}")
     public String removeFromCart(@PathVariable Long id, HttpSession session) {
