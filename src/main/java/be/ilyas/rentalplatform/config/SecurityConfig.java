@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,14 +22,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF uit voor eenvoud (in een echte app zou je dit beter configureren)
-                .csrf(AbstractHttpConfigurer::disable)
+                // ✅ CSRF AAN laten (veilig), maar H2-console uitzonderen
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                )
 
                 // Toegangsregels
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/dashboard",          // ✅ dashboard publiek bereikbaar
+                                "/dashboard",          // dashboard publiek bereikbaar (zoals jij wil)
                                 "/catalog",
                                 "/register",
                                 "/login",
@@ -43,7 +44,7 @@ public class SecurityConfig {
                         // winkelmandje en checkout enkel voor ingelogde users
                         .requestMatchers("/cart/**").authenticated()
 
-                        // profiel + orders enkel voor ingelogde users (aanrader)
+                        // profiel + orders enkel voor ingelogde users
                         .requestMatchers("/profile/**", "/orders/**").authenticated()
 
                         .anyRequest().authenticated()
@@ -59,7 +60,7 @@ public class SecurityConfig {
                 // Logout-configuratie
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/dashboard") // ✅ na logout terug dashboard
+                        .logoutSuccessUrl("/dashboard")
                         .permitAll()
                 );
 
